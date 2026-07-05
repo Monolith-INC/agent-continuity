@@ -79,6 +79,7 @@ if [[ ${#patterns[@]} -eq 0 ]]; then
     "GEMINI.md"
     ".agent/*"
     "docs/*"
+    "e2e_test/*"
     "projects/*/CLAUDE.md"
     "projects/*/GEMINI.md"
     "projects/*/.agent/*"
@@ -104,7 +105,7 @@ jq -n --arg p "$rel" --arg t "$tool" --arg cf "${codex_folder:-}" '{
     permissionDecisionReason: (
       "codex-workflow markdown allowlist blocks " + $t + " on " + $p + ". " +
       "Allowed: the codex folder (" + (if $cf == "" then "<none autodetected>" else $cf end) + ") in full, plus the configured patterns " +
-      "(default: CLAUDE.md, GEMINI.md, .agent/**, docs/**, projects/*/CLAUDE.md, projects/*/GEMINI.md, projects/*/.agent/**, projects/*/e2e_test/**). " +
+      "(default: CLAUDE.md, GEMINI.md, .agent/**, docs/**, e2e_test/**, projects/*/CLAUDE.md, projects/*/GEMINI.md, projects/*/.agent/**, projects/*/e2e_test/**). " +
       "Extend via .claude/codex-workflow.config.json (markdownAllowlist.patterns)."
     )
   }
