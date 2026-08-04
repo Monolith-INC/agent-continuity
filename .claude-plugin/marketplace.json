@@ -1,15 +1,15 @@
 {
-  "name": "codex-workflow-marketplace",
+  "name": "agent-continuity",
   "owner": {
-    "name": "Théo Carranza"
+    "name": "Th\u00e9o Carranza"
   },
-  "description": "Marketplace for codex-workflow plugin containing session management hooks and skills.",
+  "description": "Marketplace for the Agent Continuity plugin \u2014 durable agent knowledge vaults with hooks, skills, and Obsidian archetypes.",
   "plugins": [
     {
-      "name": "codex-workflow",
-      "source": "./codex-workflow",
-      "description": "Portable AI Codex workflow setup — hooks, skills, and templates for the CLAUDE.md tree + Obsidian vault pattern.",
-      "version": "0.10.2"
+      "name": "agent-continuity",
+      "source": "./agent-continuity",
+      "description": "Agent Continuity \u2014 hooks, skills, and templates pairing a codebase with an Obsidian vault as the agent's canonical knowledge base.",
+      "version": "0.11.0"
     }
   ]
 }

@@ -1,0 +1,20 @@
+{
+  "$schema-comment": "Optional config for the agent-continuity plugin. Drop this file at .claude/agent-continuity.config.json in any project that adopts the plugin. Legacy .claude/codex-workflow.config.json (and codex.* keys) are still read. All keys are optional; omitted keys fall back to sensible defaults.",
+  "vault": {
+    "folder": "AI_Codex_MyProject",
+    "bootstrap": [
+      "README.md",
+      "Knowledge/Agent_Orientation.md"
+    ]
+  },
+  "markdownAllowlist": {
+    "patterns": [
+      "CLAUDE.md",
+      "GEMINI.md",
+      ".agent/*",
+      "projects/*/CLAUDE.md",
+      "projects/*/GEMINI.md",
+      "projects/*/.agent/*"
+    ]
+  }
+}
