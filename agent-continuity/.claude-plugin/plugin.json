@@ -1,8 +1,19 @@
 {
   "name": "agent-continuity",
-  "version": "0.11.0",
-  "description": "Agent Continuity: SessionStart vault orientation injection, PreToolUse markdown allowlist + archetype naming enforcement, init skills (CLAUDE.md tree, archetype-driven Obsidian vault, .agent/rules starter set), mining skills (canonical style notes, refactor catalog entries, frontmatter backfill + Obsidian Bases dashboards), a read-only live vault-query skill, a Canvas relationship-map generator, a Defuddle-based research-ingest skill, and a vault-lint skill that audits/fixes drift. Four research-backed vault archetypes (software-project, research, personal-pkm, technical-docs).",
+  "displayName": "Agent Continuity",
+  "version": "0.11.1",
+  "description": "Keeps coding agents continuous across sessions\u2014Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint.",
   "author": {
     "name": "Th\u00e9o Carranza"
-  }
+  },
+  "homepage": "https://github.com/Monolith-INC/agent-continuity",
+  "repository": "https://github.com/Monolith-INC/agent-continuity",
+  "keywords": [
+    "obsidian",
+    "agent-memory",
+    "knowledge-base",
+    "hooks",
+    "continuity",
+    "claude-code"
+  ]
 }

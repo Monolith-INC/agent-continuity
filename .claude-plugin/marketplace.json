@@ -3,13 +3,13 @@
   "owner": {
     "name": "Th\u00e9o Carranza"
   },
-  "description": "Marketplace for the Agent Continuity plugin \u2014 durable agent knowledge vaults with hooks, skills, and Obsidian archetypes.",
+  "description": "Agent Continuity \u2014 durable Obsidian knowledge vaults for coding agents (hooks, skills, archetypes).",
   "plugins": [
     {
       "name": "agent-continuity",
       "source": "./agent-continuity",
-      "description": "Agent Continuity \u2014 hooks, skills, and templates pairing a codebase with an Obsidian vault as the agent's canonical knowledge base.",
-      "version": "0.11.0"
+      "description": "Keeps coding agents continuous across sessions\u2014Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint.",
+      "version": "0.11.1"
     }
   ]
 }

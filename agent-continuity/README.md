@@ -1,123 +1,80 @@
-# agent-continuity
+# agent-continuity (plugin package)
 
-Portable hooks and skills for **Agent Continuity**: a project layout pairing a codebase with an Obsidian vault that serves as the canonical agent knowledge base.
+[![Docs](https://img.shields.io/badge/docs-repository%20README-0ea5e9)](../README.md)
+[![Version](https://img.shields.io/badge/version-0.11.1-0ea5e9)](./.claude-plugin/plugin.json)
 
-## What's in v0.11.0
-
-Product rename: **Agent Continuity** (`agent-continuity`). Skill ids drop the old `codex-` prefix (e.g. `/agent-continuity:init-vault`). Config moves to `.claude/agent-continuity.config.json` with `vault.*` keys; legacy `codex-workflow` config paths/keys and `.codex-vault.json` markers still work.
-
-## What's in v0.10.0
-
-Three hooks, three init skills, three mining skills, one live query skill, one Canvas generator, one research-ingest skill, one vault-lint skill, and **four research-backed vault archetypes** — all configurable per project with sensible zero-config defaults.
-
-### Init skills
-
-- `/agent-continuity:init-workspace` — scaffold the CLAUDE.md tree (root + per-project) by inspecting `package.json` / `pubspec.yaml`.
-- `/agent-continuity:init-vault [--type <archetype>]` — scaffold an Obsidian vault from a research-backed **archetype**: `software-project` (default), `research` (Zettelkasten+PARA), `personal-pkm` (PARA), or `technical-docs` (Diataxis). Reads the archetype spec for folder structure + naming + frontmatter, scaffolds the skeleton, and writes a `.agent-continuity-vault.json` marker. See [`archetypes/README.md`](./archetypes/README.md).
-- `/agent-continuity:init-rules` — drop a starter set of `.agent/rules/*.md` template files (`strict-implementation-lock`, `rules-architect-protocol`, `rules-git-workflow`, `rules-date-time-handling`).
-
-### Mining skills
-
-- `/agent-continuity:mine-style` — interactive walkthrough that mines an author's commits (`git log --author=...`) to draft a canonical-style-examples Knowledge note with file/line anchors and an Agent Rules block.
-- `/agent-continuity:add-refactor-entry <commit-hash>` — inspect a refactor commit and append a before/after entry to the Style Refactor Catalog with the principle applied.
-- `/agent-continuity:mine-bases` — backfill the frontmatter convention across an existing vault and scaffold Obsidian Bases (`.base`) over `Tickets/`, `Features/`, `Agent_Sessions/`. Turns flat folders into live, queryable dashboards. Status is derived from the folder, never duplicated. See [`references/frontmatter-convention.md`](./references/frontmatter-convention.md) for the schema.
-
-### Query skills
-
-- `/agent-continuity:query-vault` — **read-only** live query of the vault via the Obsidian CLI: list/query Bases (open tickets, features by area, recent sessions), full-text `search`, and `backlinks` — instead of raw file reads. The sanctioned read channel that complements the markdown allowlist. Requires Obsidian running with the vault open; degrades gracefully when it isn't. Unlike the side-effecting init/mining skills, this one **allows model invocation** (it's read-only), so agents can reach for it whenever they need vault state.
-
-### Canvas skills
-
-- `/agent-continuity:canvas-map <hub-note>` — generate an Obsidian Canvas (`.canvas`) relationship map for a hub note: the note centered, its outgoing `links` on one side and its `backlinks` on the other, wired with arrows, saved to `Architecture/`. Reads the link graph via the Obsidian CLI (composes the v0.5.0 query channel with the JSON Canvas format). Requires Obsidian running; validates node/edge integrity before writing.
-
-### Research skills
-
-- `/agent-continuity:research-ingest <url>` — fetch an external web page as clean markdown with the [Defuddle](https://github.com/kepano/defuddle) CLI and file it into `Knowledge/` as a source-stamped `type: reference` note (with `source`/`domain`/`retrieved` frontmatter and a provenance callout). More than a fetch: it follows the frontmatter convention and slots into the Knowledge index. Requires `defuddle` (`npm install -g defuddle`).
-
-### Maintenance skills
-
-- `/agent-continuity:vault-lint [vault] [--type <archetype>]` — audit an existing vault against its archetype spec and fix the drift: filename violations, frontmatter issues, stray files, and (semantic layer) mixed-language / near-duplicate / mangled notes. Proposes renames + frontmatter fixes, applies them with `git mv` and **wikilink repair** on confirmation, then re-scans. The retrofit path for vaults that predate archetypes. Backed by the deterministic scanner `scripts/vault-lint.py`.
-
-Every skill is an interactive walkthrough: it inspects current state, proposes a plan, asks the user to confirm, then writes. Existing files are never overwritten without explicit per-file approval.
-
-### Hooks
-
-### `SessionStart` — vault orientation injection
-
-Reads the project's vault `README.md` and `Knowledge/Agent_Orientation.md` and injects them as `additionalContext` so every new session boots with the workspace map already loaded.
-
-- **Vault folder name** comes from `.claude/agent-continuity.config.json` (`vault.folder`) or falls back to autodetect via glob `AI_Codex_*/`.
-- **Files to inject** come from `vault.bootstrap[]` or default to `["README.md", "Knowledge/Agent_Orientation.md"]`.
-- If no vault folder is found, the hook is a silent no-op.
-
-### `PreToolUse` (matcher `Read|Grep`) — markdown allowlist
-
-Denies Read/Grep on markdown files inside the project tree that aren't on a small allowlist. Reads outside the project, and reads of non-`.md` files, pass through.
-
-- **Allowlist patterns** come from `markdownAllowlist.patterns[]` or default to:
-  - `CLAUDE.md`, `GEMINI.md` at any level
-  - any `*.md` under `.agent/` (recursive)
-  - `projects/*/CLAUDE.md`, `projects/*/GEMINI.md`, `projects/*/.agent/*`
-- **Vault folder is always fully allowed** (matched by name from config or autodetect).
-- Custom patterns use bash `case` glob syntax (`*` matches any characters including `/`).
-
-### `PreToolUse` (matcher `Write`) — archetype naming enforcement
-
-Structurally gates new `.md` writes inside a vault that declares its archetype (a
-`.agent-continuity-vault.json` marker written by `init-vault`). Reads the marker → the archetype
-spec, and **denies** a write whose filename shape is wrong or whose frontmatter is missing a
-required key / contains a forbidden one (e.g. `status` in a ticket). It is **fail-open**: a no-op
-outside a marked vault, for unknown archetypes, or for exempt files (`README.md`,
-`Agent_Orientation.md`, `Home.md`, `index.md`, and `assets/` / `Meta/` folders).
-
-- Enforces only what regex/sets can decide (filename **shape**, required/forbidden frontmatter
-  **keys**) — semantic issues (language, near-duplicates) are `vault-lint`'s job.
-- Disable per project via `.claude/agent-continuity.config.json` → `{"namingEnforcement":{"enabled":false}}`.
-- Implemented in `hooks/scripts/naming-enforcement.py` (Python 3, stdlib only).
-
-## Installation
-
-Add the marketplace once per machine, then install the plugin:
+Claude Code plugin package for **Agent Continuity**. Product narrative, skill catalog, and workflow diagrams live in the [repository README](../README.md). This file is the **package reference**: hooks, layout, config keys, and dependencies.
 
 ```text
-/plugin marketplace add <your-github-owner>/agent-continuity
+/plugin marketplace add Monolith-INC/agent-continuity
 /plugin install agent-continuity@agent-continuity
 ```
 
-After installation, open `/hooks` (or restart Claude Code) to ensure the watcher picks up the new hooks for the current session. New sessions get them automatically.
+---
 
-## Configuration
+## Hooks (always-on)
 
-Most projects need zero configuration — the defaults match the convention this plugin assumes.
+| Event | Script | Behavior |
+| --- | --- | --- |
+| `SessionStart` | `hooks/scripts/bootstrap.sh` | Inject vault bootstrap files as `additionalContext` |
+| `PreToolUse` `Read\|Grep` | `hooks/scripts/markdown-allowlist.sh` | Deny project `.md` reads outside allowlist + vault |
+| `PreToolUse` `Write` | `hooks/scripts/naming-enforcement.py` | Deny vault `.md` writes that violate archetype filename/frontmatter shape |
 
-If you want to customize, drop a file at `.claude/agent-continuity.config.json` in your project. See `examples/agent-continuity.config.example.json` for the schema. Every key is optional; omitted keys fall back to the defaults above.
+```mermaid
+flowchart TB
+  SS[SessionStart] --> Boot[bootstrap.sh]
+  Boot --> Ctx[additionalContext from vault]
 
-## Roadmap
+  R[Read / Grep *.md] --> AL[markdown-allowlist.sh]
+  AL -->|allowlisted or vault| OK1[Allow]
+  AL -->|else in project| DENY1[Deny]
 
-| Version         | Adds                                                                                                                                                                                    |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0.1.0           | Hooks: SessionStart bootstrap + PreToolUse markdown allowlist. Config-driven, with autodetect fallback.                                                                                 |
-| 0.1.1           | Hooks: broaden `AI_Codex*/` autodetect glob; silently skip missing bootstrap files.                                                                                                     |
-| 0.2.0           | Init skills: `init-workspace`, `init-vault`, `init-rules`.                                                                                                            |
-| 0.3.0           | Mining skills: `mine-style`, `add-refactor-entry`.                                                                                                                          |
-| 0.4.0           | Bases tranche: `mine-bases` skill + frontmatter convention; `init-vault` now emits `.base` dashboards (Tickets/Features/Agent_Sessions).                                    |
-| 0.5.0           | obsidian-cli tranche: `query-vault` — read-only live `base:query`/`search`/`backlinks` vault access.                                                                              |
-| 0.6.0           | json-canvas tranche: `canvas-map` — Canvas relationship map for a hub note (links + backlinks) into `Architecture/`.                                                              |
-| 0.7.0           | defuddle tranche: `research-ingest` — fetch a URL via Defuddle into a source-stamped `Knowledge/` reference note.                                                                 |
-| 0.8.0           | Vault archetypes: 4 research-backed specs (software-project/research/personal-pkm/technical-docs); `init-vault --type` scaffolds from spec + writes a `.agent-continuity-vault.json` marker. |
-| 0.9.0           | `PreToolUse(Write)` archetype naming-enforcement hook — structural filename + frontmatter gating, marker-gated and fail-open.                                                           |
-| 0.10.0 (this)   | `vault-lint` — audit a vault against its archetype spec (structural scanner + semantic layer) and apply renames/frontmatter fixes with backlink repair.                           |
-| 0.6.0 (planned) | json-canvas tranche: Architecture canvases.                                                                                                                                             |
-| 0.7.0 (planned) | defuddle tranche: clean research ingestion into `Knowledge/`.                                                                                                                           |
+  W[Write *.md] --> NE[naming-enforcement.py]
+  NE -->|no marker / exempt| OK2[Allow fail-open]
+  NE -->|matches archetype| OK3[Allow]
+  NE -->|shape/keys wrong| DENY2[Deny + reason]
+```
 
-See [`docs/obsidian-leverage.md`](./docs/obsidian-leverage.md) for how each tranche maps to the `obsidian-skills` plugin, and the open-runway status.
+### Config resolution
+
+1. Prefer `.claude/agent-continuity.config.json`
+2. Else legacy `.claude/codex-workflow.config.json`
+3. Vault folder: `vault.folder` → else `codex.folder` → else first `AI_Codex*/`
+4. Bootstrap list: `vault.bootstrap` → else `codex.bootstrap` → else `README.md`, `Knowledge/Agent_Orientation.md`
+
+### Marker resolution
+
+1. `.agent-continuity-vault.json`
+2. Legacy `.codex-vault.json`
+
+Disable naming enforcement: `{"namingEnforcement":{"enabled":false}}`.
+
+---
+
+## Skills (on-demand)
+
+| Skill | Model invoke | Needs |
+| --- | --- | --- |
+| `init-workspace` | no | — |
+| `init-vault` | no | — |
+| `init-rules` | no | — |
+| `mine-style` | no | git history |
+| `add-refactor-entry` | no | commit hash |
+| `mine-bases` | no | existing vault |
+| `query-vault` | **yes** (read-only) | Obsidian CLI + app open |
+| `canvas-map` | no | Obsidian CLI + app open |
+| `research-ingest` | no | Defuddle CLI |
+| `vault-lint` | no | vault (+ optional `--type`) |
+
+Full when/why/expect tables: [repository README → Skills catalog](../README.md#skills-catalog).
+
+---
 
 ## Layout
 
-```
+```text
 agent-continuity/
-├── .claude-plugin/
-│   └── plugin.json
+├── .claude-plugin/plugin.json
 ├── hooks/
 │   ├── hooks.json
 │   └── scripts/
@@ -125,45 +82,49 @@ agent-continuity/
 │       ├── markdown-allowlist.sh
 │       └── naming-enforcement.py
 ├── skills/
-│   ├── init-workspace/SKILL.md
-│   ├── init-vault/SKILL.md
-│   ├── init-rules/SKILL.md
-│   ├── mine-style/SKILL.md
-│   ├── add-refactor-entry/SKILL.md
-│   ├── mine-bases/SKILL.md
-│   ├── query-vault/SKILL.md
-│   ├── canvas-map/SKILL.md
-│   ├── research-ingest/SKILL.md
-│   └── vault-lint/SKILL.md
-├── archetypes/
-│   ├── README.md            ← archetype spec format + marker
-│   ├── software-project.json
-│   ├── research.json
-│   ├── personal-pkm.json
-│   └── technical-docs.json
-├── references/
-│   └── frontmatter-convention.md
-├── docs/
-│   └── obsidian-leverage.md
-├── scripts/
-│   └── vault-lint.py        ← deterministic vault scanner
-├── examples/
-│   └── agent-continuity.config.example.json
-└── README.md
+│   ├── init-workspace/
+│   ├── init-vault/
+│   ├── init-rules/
+│   ├── mine-style/
+│   ├── add-refactor-entry/
+│   ├── mine-bases/
+│   ├── query-vault/
+│   ├── canvas-map/
+│   ├── research-ingest/
+│   └── vault-lint/
+├── archetypes/          ← software-project, research, personal-pkm, technical-docs
+├── scripts/vault-lint.py
+├── references/frontmatter-convention.md
+├── docs/obsidian-leverage.md
+└── examples/agent-continuity.config.example.json
 ```
+
+---
 
 ## Dependencies
 
-Hook scripts require:
+| Component | Requires |
+| --- | --- |
+| Hooks | `bash`, `jq`, `realpath`, `python3` |
+| `query-vault`, `canvas-map` | [`obsidian` CLI](https://github.com/Yakitrak/obsidian-cli), Obsidian running |
+| `research-ingest` | [`defuddle`](https://github.com/kepano/defuddle) |
 
-- `bash`
-- `jq`
-- `realpath` (part of GNU coreutils)
-- `python3` (stdlib only — for the naming-enforcement hook)
+---
 
-All three are standard on Linux and recent macOS. Windows users running under WSL or Git Bash should also be fine.
+## Version history (shipped)
 
-Some skills have optional runtime dependencies (the skill degrades or instructs install when absent):
+| Version | Milestone |
+| --- | --- |
+| 0.1.x | SessionStart bootstrap + markdown allowlist |
+| 0.2.0 | Init skills: workspace, vault, rules |
+| 0.3.0 | Mining: style + refactor catalog |
+| 0.4.0 | Bases + frontmatter convention |
+| 0.5.0 | `query-vault` (obsidian CLI) |
+| 0.6.0 | `canvas-map` |
+| 0.7.0 | `research-ingest` (Defuddle) |
+| 0.8.0 | Four vault archetypes + marker |
+| 0.9.0 | Write-path naming enforcement |
+| 0.10.x | `vault-lint` + allowlist extensions |
+| **0.11.0** | Rename to **Agent Continuity**; legacy config/marker compat |
 
-- `query-vault`, `canvas-map` — the [`obsidian` CLI](https://github.com/Yakitrak/obsidian-cli) and Obsidian running with the vault open.
-- `research-ingest` — the [`defuddle`](https://github.com/kepano/defuddle) CLI (`npm install -g defuddle`).
+See also [`docs/obsidian-leverage.md`](./docs/obsidian-leverage.md).
