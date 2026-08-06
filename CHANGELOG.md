@@ -2,6 +2,7 @@
 
 ## 0.12.0
 
+- Install script upgrades in one command (replaces prior managed install).
 - Flatten plugin to Open Plugins layout at repo root (`.plugin/plugin.json`).
 - Marketplace source is `./` (single-plugin repo).
 - Add host adapters, curl installers, VERSION lockstep packaging, and CI.

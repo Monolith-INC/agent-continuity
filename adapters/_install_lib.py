@@ -359,34 +359,48 @@ def register_codex(plan: Plan) -> Either:
             )
 
 
+def replace_managed(plan: Plan) -> Either:
+    """Best-effort removal of a prior managed install so plain install upgrades in one shot."""
+    print(f"Replacing any prior managed {plan.host} install…")
+    return fold_either(
+        uninstall(plan),
+        lambda error: Left(error),
+        lambda done: Right(done),
+    )
+
+
 def install(plan: Plan) -> Either:
     return fold_either(
         ensure_built(plan),
         lambda error: Left(error),
         lambda built: fold_either(
-            {
-                "cursor": install_cursor,
-                "claude": lambda p: fold_either(
-                    install_marketplace_copy(p),
-                    lambda error: Left(error),
-                    lambda ready: fold_either(
-                        register_claude(ready),
-                        lambda error: Left(error),
-                        lambda _code: Right(ready),
-                    ),
-                ),
-                "codex": lambda p: fold_either(
-                    install_marketplace_copy(p),
-                    lambda error: Left(error),
-                    lambda ready: fold_either(
-                        register_codex(ready),
-                        lambda error: Left(error),
-                        lambda _code: Right(ready),
-                    ),
-                ),
-            }[built.host](built),
+            replace_managed(built),
             lambda error: Left(error),
-            lambda done: Right(done),
+            lambda cleared: fold_either(
+                {
+                    "cursor": install_cursor,
+                    "claude": lambda p: fold_either(
+                        install_marketplace_copy(p),
+                        lambda error: Left(error),
+                        lambda ready: fold_either(
+                            register_claude(ready),
+                            lambda error: Left(error),
+                            lambda _code: Right(ready),
+                        ),
+                    ),
+                    "codex": lambda p: fold_either(
+                        install_marketplace_copy(p),
+                        lambda error: Left(error),
+                        lambda ready: fold_either(
+                            register_codex(ready),
+                            lambda error: Left(error),
+                            lambda _code: Right(ready),
+                        ),
+                    ),
+                }[cleared.host](cleared),
+                lambda error: Left(error),
+                lambda done: Right(done),
+            ),
         ),
     )
 
@@ -529,12 +543,16 @@ def print_next_steps(plan: Plan) -> None:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Install or uninstall a host adapter plugin built from this template.",
+        description=(
+            "Install or uninstall a host adapter plugin. "
+            "Plain install replaces any prior managed install of this plugin."
+        ),
         epilog=(
             "Examples:\n"
             "  python3 adapters/_install_lib.py --host cursor\n"
             "  python3 adapters/_install_lib.py --host claude --dry-run\n"
             "  python3 adapters/_install_lib.py --host codex --prefix /tmp/plugin-smoke\n"
+            "  python3 adapters/_install_lib.py --host claude --uninstall\n"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -542,7 +560,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--root", help="Repository root (defaults to template root)")
     parser.add_argument("--prefix", help="Override install root (skips host CLI registration)")
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--uninstall", action="store_true")
+    parser.add_argument(
+        "--uninstall",
+        action="store_true",
+        help="Remove a managed install only (do not install)",
+    )
     return parser.parse_args(argv)
 
 

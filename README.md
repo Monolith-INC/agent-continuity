@@ -239,6 +239,8 @@ flowchart TD
 
 ### One-command install
 
+One command upgrades in place (replaces any prior managed install).
+
 ```bash
 # Claude Code
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/install.sh \

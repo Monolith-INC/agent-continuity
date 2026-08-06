@@ -15,7 +15,10 @@ FORWARD_ARGS=()
 usage() {
   local host="${INSTALL_HOST:-<host>}"
   cat <<EOF
-Install the ${host} adapter plugin from this template.
+Install the ${host} adapter plugin.
+
+Plain install replaces any prior managed install of this plugin (one command to upgrade).
+Use --uninstall only when you want to remove it without installing.
 
 Usage:
   adapters/${host}/install.sh [options]
@@ -28,7 +31,7 @@ Options:
   --prefix DIR        Override install root (skips host CLI registration)
   --root DIR          Use an existing checkout instead of cloning
   --dry-run           Print the plan without changing files
-  --uninstall         Remove a managed install
+  --uninstall         Remove a managed install only
   -h, --help          Show this help
 
 Environment:
@@ -39,7 +42,6 @@ Environment:
 Examples:
   ./adapters/${host}/install.sh
   ./adapters/${host}/install.sh --dry-run
-  ./adapters/${host}/install.sh --prefix /tmp/plugin-smoke
   curl -fsSL https://raw.githubusercontent.com/OWNER/REPO/main/adapters/${host}/install.sh \\
     | bash -s -- --repo OWNER/REPO --ref main
 EOF
