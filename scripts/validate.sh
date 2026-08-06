@@ -42,12 +42,29 @@ match claude.get("version"):
     case other:
         fail(f".claude-plugin/plugin.json version {other!r} != VERSION {VERSION!r}")
 
-marketplace = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
-match marketplace.get("plugins", [{}])[0].get("version"):
+cursor = json.loads((ROOT / ".cursor-plugin" / "plugin.json").read_text(encoding="utf-8"))
+match cursor.get("version"):
     case version if version == VERSION:
         pass
     case other:
-        fail(f"marketplace plugin version {other!r} != VERSION {VERSION!r}")
+        fail(f".cursor-plugin/plugin.json version {other!r} != VERSION {VERSION!r}")
+
+for relative in (
+    Path(".claude-plugin") / "marketplace.json",
+    Path(".cursor-plugin") / "marketplace.json",
+    Path(".agents") / "plugins" / "marketplace.json",
+):
+    marketplace = json.loads((ROOT / relative).read_text(encoding="utf-8"))
+    match marketplace.get("plugins", [{}])[0].get("version"):
+        case version if version == VERSION:
+            pass
+        case other:
+            fail(f"{relative.as_posix()} plugin version {other!r} != VERSION {VERSION!r}")
+    match marketplace.get("plugins", [{}])[0].get("source"):
+        case "./" | "./.":
+            pass
+        case other:
+            fail(f"{relative.as_posix()} plugin source must be './', got {other!r}")
 
 for host in ("cursor", "claude", "codex"):
     manifest = json.loads((ROOT / "adapters" / host / "plugin.template.json").read_text(encoding="utf-8"))

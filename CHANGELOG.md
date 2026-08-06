@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.3
+
+- Codex marketplace fix: built adapters emit `.agents/plugins/marketplace.json` (Codex does not accept `.codex-plugin/` alone).
+- Repo-root marketplace indexes for hassle-free host installs: `.agents/plugins/marketplace.json`, `.cursor-plugin/marketplace.json` (+ plugin.json), keep `.claude-plugin/`.
+- Document all install options per host (curl, Claude `/plugin`, Codex CLI marketplace, Cursor team import / public submit).
+
 ## 0.12.2
 
 - Dedicated `adapters/<host>/uninstall.sh`; removed `--uninstall` from `install.sh`.

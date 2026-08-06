@@ -58,6 +58,28 @@ class BuildPluginTests(unittest.TestCase):
             self.assertTrue(any(name.startswith("cursor-marketplace/") for name in names))
             self.assertIsNotNone(payload["zip"])
 
+    def test_build_codex_writes_agents_plugins_marketplace_manifest(self) -> None:
+        root = repo_root()
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "codex-marketplace"
+            zip_path = Path(temporary) / "plugin.zip"
+            result = run_build(
+                host="codex",
+                host_plugin_dir=".codex-plugin",
+                adapter_root=root / "adapters" / "codex",
+                output=output,
+                zip_path=zip_path,
+            )
+            fold(result, self.fail, lambda value: value)
+            agents_manifest = output / ".agents" / "plugins" / "marketplace.json"
+            claude_manifest = output / ".claude-plugin" / "marketplace.json"
+            vendor_manifest = output / ".codex-plugin" / "marketplace.json"
+            self.assertTrue(agents_manifest.is_file())
+            self.assertTrue(claude_manifest.is_file())
+            self.assertTrue(vendor_manifest.is_file())
+            self.assertEqual(agents_manifest.read_text(), claude_manifest.read_text())
+            self.assertEqual(agents_manifest.read_text(), vendor_manifest.read_text())
+
 
 if __name__ == "__main__":
     raise SystemExit(unittest.main())

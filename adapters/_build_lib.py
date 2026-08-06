@@ -135,6 +135,19 @@ def marketplace_document(version: str, description: str) -> dict:
     }
 
 
+def marketplace_manifest_paths(output: Path, host_plugin_dir: str) -> tuple[Path, ...]:
+    """Codex accepts `.agents/plugins/`, `.claude-plugin/`, `.cursor-plugin/` — not `.codex-plugin/`."""
+    match host_plugin_dir:
+        case ".codex-plugin":
+            return (
+                output / ".agents" / "plugins" / "marketplace.json",
+                output / ".claude-plugin" / "marketplace.json",
+                output / host_plugin_dir / "marketplace.json",
+            )
+        case _:
+            return (output / host_plugin_dir / "marketplace.json",)
+
+
 def copy_component_tree(source: Path, destination: Path) -> None:
     match source.exists():
         case True:
@@ -241,10 +254,9 @@ def _finish_materialize(
             pass
     description = str(manifest.get("description", PLUGIN_NAME))
     version = str(manifest["version"])
-    write_json(
-        output / host_plugin_dir / "marketplace.json",
-        marketplace_document(version, description),
-    )
+    marketplace = marketplace_document(version, description)
+    for path in marketplace_manifest_paths(output, host_plugin_dir):
+        write_json(path, marketplace)
     adapter_readme = adapter_root / "README.md"
     match adapter_readme.is_file():
         case True:

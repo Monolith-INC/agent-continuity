@@ -1,6 +1,6 @@
 {
   "name": "agent-continuity",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "description": "Keeps coding agents continuous across sessions—Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint. (Claude Code edition).",
   "author": {
     "name": "Théo Carranza"

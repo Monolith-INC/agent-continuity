@@ -1,5 +1,7 @@
 # Codex adapter
 
+Codex requires the marketplace index at `.agents/plugins/marketplace.json` (the build emits that path; `.codex-plugin/marketplace.json` is also written for Open Plugins parity).
+
 ## Install (users)
 
 One command for this repo:

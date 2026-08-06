@@ -4,17 +4,24 @@
 [![Tag](https://img.shields.io/github/v/tag/Monolith-INC/agent-continuity?label=latest%20tag)](https://github.com/Monolith-INC/agent-continuity/tags)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-1f6feb?logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
 [![Obsidian](https://img.shields.io/badge/Obsidian-vault%20native-7c3aed?logo=obsidian&logoColor=white)](https://obsidian.md/)
-[![Version](https://img.shields.io/badge/plugin-v0.12.2-0ea5e9)](./.plugin/plugin.json)
+[![Version](https://img.shields.io/badge/plugin-v0.12.3-0ea5e9)](./.plugin/plugin.json)
 
 **Durable knowledge for coding agents.** Pair your repository with an Obsidian vault so agents keep orientation, tickets, style, and architecture context across sessions—instead of rediscovering the project every time.
 
 ### Claude Code
 
-Install:
+Install (curl):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+Marketplace (in Claude Code):
+
+```text
+/plugin marketplace add Monolith-INC/agent-continuity
+/plugin install agent-continuity@agent-continuity
 ```
 
 Uninstall:
@@ -26,12 +33,16 @@ curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/
 
 ### Cursor
 
-Install:
+Install (curl → `~/.cursor/plugins/local`):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
+
+Team marketplace: Dashboard → Plugins → Add Marketplace → Import from Repo → `Monolith-INC/agent-continuity` (uses root `.cursor-plugin/marketplace.json`).
+
+Public marketplace: submit the repo at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish) after local verification.
 
 Uninstall:
 
@@ -42,11 +53,18 @@ curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/
 
 ### Codex
 
-Install:
+Install (curl):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+Marketplace (CLI; repo root ships `.agents/plugins/marketplace.json`):
+
+```bash
+codex plugin marketplace add Monolith-INC/agent-continuity --ref main
+codex plugin add agent-continuity@agent-continuity
 ```
 
 Uninstall:
@@ -56,14 +74,8 @@ curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
 
-Claude alternative (marketplace add from this repo):
+Then `/reload-plugins` (or restart Claude Code / Reload Window in Cursor / new Codex thread).
 
-```text
-/plugin marketplace add Monolith-INC/agent-continuity
-/plugin install agent-continuity@agent-continuity
-```
-
-Then `/reload-plugins` (or restart Claude Code / Reload Window in Cursor).
 
 ---
 
@@ -277,14 +289,31 @@ flowchart TD
 
 One command upgrades in place (replaces any prior managed install). From a clone: `./adapters/<host>/install.sh` or `./adapters/<host>/uninstall.sh`.
 
+Root marketplace indexes (for GitHub / team import):
+
+| Host | Manifest |
+| --- | --- |
+| Claude Code | `.claude-plugin/marketplace.json` |
+| Cursor | `.cursor-plugin/marketplace.json` |
+| Codex | `.agents/plugins/marketplace.json` (also accepts `.claude-plugin/` / `.cursor-plugin/`) |
+
 ### Claude Code
 
-Install:
+Install (curl):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
+
+Marketplace:
+
+```text
+/plugin marketplace add Monolith-INC/agent-continuity
+/plugin install agent-continuity@agent-continuity
+```
+
+Or CLI: `claude plugin marketplace add Monolith-INC/agent-continuity` then `claude plugin install agent-continuity@agent-continuity`.
 
 Uninstall:
 
@@ -295,12 +324,16 @@ curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/
 
 ### Cursor
 
-Install:
+Install (curl → `~/.cursor/plugins/local/agent-continuity`):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
+
+Team marketplace: **Dashboard → Plugins → Add Marketplace → Import from Repo** → `https://github.com/Monolith-INC/agent-continuity` (reads `.cursor-plugin/marketplace.json`).
+
+Public Cursor Marketplace: after testing locally, submit at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish).
 
 Uninstall:
 
@@ -311,11 +344,18 @@ curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/
 
 ### Codex
 
-Install:
+Install (curl):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+Marketplace:
+
+```bash
+codex plugin marketplace add Monolith-INC/agent-continuity --ref main
+codex plugin add agent-continuity@agent-continuity
 ```
 
 Uninstall:
@@ -323,15 +363,6 @@ Uninstall:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
-```
-
-### Claude marketplace (also supported)
-
-This repo is a flat Open Plugins package. The root `.claude-plugin/marketplace.json` points at `./`, so GitHub marketplace add still works:
-
-```text
-/plugin marketplace add Monolith-INC/agent-continuity
-/plugin install agent-continuity@agent-continuity
 ```
 
 Open `/hooks` or restart the host so SessionStart / PreToolUse hooks attach to the current session.
@@ -398,6 +429,9 @@ agent-continuity/
 ├── .plugin/plugin.json           ← Open Plugins manifest
 ├── .claude-plugin/               ← Claude marketplace + plugin manifests
 │   ├── marketplace.json          ← source: ./
+├── .cursor-plugin/               ← Cursor marketplace + plugin manifests
+│   ├── marketplace.json          ← source: ./
+├── .agents/plugins/marketplace.json ← Codex-native marketplace index
 │   └── plugin.json
 ├── hooks/                        ← SessionStart + PreToolUse
 ├── skills/                       ← ten interactive skills
