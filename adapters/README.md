@@ -33,7 +33,16 @@ Forks: replace `Monolith-INC/agent-continuity` with `OWNER/REPO`.
 Uninstall:
 
 ```bash
+# Claude Code
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Cursor
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Codex
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
 

@@ -16,6 +16,19 @@ curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/
 # Cursor
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Uninstall
+# Claude Code
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Cursor
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Codex
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
 
 Claude alternative (marketplace add from this repo):
@@ -261,11 +274,20 @@ From a clone: `./adapters/<host>/install.sh`.
 ### Uninstall
 
 ```bash
+# Claude Code
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Cursor
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Codex
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
 
-Use `adapters/cursor/uninstall.sh` or `adapters/codex/uninstall.sh` for those hosts.
+From a clone: `./adapters/<host>/uninstall.sh`.
 
 ### Claude marketplace (also supported)
 

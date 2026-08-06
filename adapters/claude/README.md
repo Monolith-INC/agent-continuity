@@ -35,6 +35,13 @@ Restart Claude Code if needed, then invoke `/agent-continuity:query-vault`.
 
 Flags: `--dry-run`, `--prefix DIR`. Uninstall: `adapters/<host>/uninstall.sh`. (copies marketplace only; prints the `/plugin` commands and skips CLI registration).
 
+
+## Uninstall
+
+
+
+From a local clone: .
+
 ## Authoring / build
 
 ```bash

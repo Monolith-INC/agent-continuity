@@ -21,6 +21,13 @@ Installs to `~/.cursor/plugins/local/agent-continuity`. Restart Cursor or run **
 
 Flags: `--dry-run`, `--prefix DIR`. Uninstall: `adapters/<host>/uninstall.sh`. (smoke tests; skips real Cursor home).
 
+
+## Uninstall
+
+
+
+From a local clone: .
+
 ## Authoring / build
 
 ```bash
