@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.12.0
+## 0.12.1
 
 - Install script upgrades in one command (replaces prior managed install).
+- Document single curl install; `--uninstall` is remove-only.
+
+## 0.12.0
+
 - Flatten plugin to Open Plugins layout at repo root (`.plugin/plugin.json`).
 - Marketplace source is `./` (single-plugin repo).
 - Add host adapters, curl installers, VERSION lockstep packaging, and CI.

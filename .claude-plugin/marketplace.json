@@ -9,7 +9,7 @@
       "name": "agent-continuity",
       "source": "./",
       "description": "Keeps coding agents continuous across sessions—Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint.",
-      "version": "0.12.0"
+      "version": "0.12.1"
     }
   ]
 }
