@@ -33,7 +33,7 @@ Equivalent in a Claude session:
 
 Restart Claude Code if needed, then invoke `/agent-continuity:query-vault`.
 
-Flags: `--dry-run`, `--uninstall`, `--prefix DIR` (copies marketplace only; prints the `/plugin` commands and skips CLI registration).
+Flags: `--dry-run`, `--prefix DIR`. Uninstall: `adapters/<host>/uninstall.sh`. (copies marketplace only; prints the `/plugin` commands and skips CLI registration).
 
 ## Authoring / build
 

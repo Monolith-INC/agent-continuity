@@ -563,7 +563,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--uninstall",
         action="store_true",
-        help="Remove a managed install only (do not install)",
+        help="Remove a managed install only (invoked by adapters/<host>/uninstall.sh)",
     )
     return parser.parse_args(argv)
 

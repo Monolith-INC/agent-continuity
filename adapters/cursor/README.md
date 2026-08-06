@@ -19,7 +19,7 @@ From a local clone:
 
 Installs to `~/.cursor/plugins/local/agent-continuity`. Restart Cursor or run **Developer: Reload Window**, then invoke `/agent-continuity:query-vault`.
 
-Flags: `--dry-run`, `--uninstall`, `--prefix DIR` (smoke tests; skips real Cursor home).
+Flags: `--dry-run`, `--prefix DIR`. Uninstall: `adapters/<host>/uninstall.sh`. (smoke tests; skips real Cursor home).
 
 ## Authoring / build
 

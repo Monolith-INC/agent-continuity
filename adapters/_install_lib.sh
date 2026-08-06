@@ -7,7 +7,6 @@ INSTALL_HOST="${INSTALL_HOST:-}"
 PLUGIN_INSTALL_REPO="${PLUGIN_INSTALL_REPO:-}"
 PLUGIN_INSTALL_REF="${PLUGIN_INSTALL_REF:-main}"
 INSTALL_DRY_RUN=0
-INSTALL_UNINSTALL=0
 INSTALL_PREFIX=""
 INSTALL_ROOT_OVERRIDE=""
 FORWARD_ARGS=()
@@ -18,7 +17,7 @@ usage() {
 Install the ${host} adapter plugin.
 
 Plain install replaces any prior managed install of this plugin (one command to upgrade).
-Use --uninstall only when you want to remove it without installing.
+To remove without installing, use adapters/${host}/uninstall.sh.
 
 Usage:
   adapters/${host}/install.sh [options]
@@ -31,7 +30,6 @@ Options:
   --prefix DIR        Override install root (skips host CLI registration)
   --root DIR          Use an existing checkout instead of cloning
   --dry-run           Print the plan without changing files
-  --uninstall         Remove a managed install only
   -h, --help          Show this help
 
 Environment:
@@ -71,8 +69,9 @@ parse_install_args() {
         shift
         ;;
       --uninstall)
-        INSTALL_UNINSTALL=1
-        shift
+        echo "error: --uninstall was removed from install.sh" >&2
+        echo "use: adapters/${INSTALL_HOST:-<host>}/uninstall.sh" >&2
+        exit 2
         ;;
       -h|--help)
         usage
@@ -152,9 +151,6 @@ build_python_args() {
   fi
   if [[ "$INSTALL_DRY_RUN" -eq 1 ]]; then
     FORWARD_ARGS+=(--dry-run)
-  fi
-  if [[ "$INSTALL_UNINSTALL" -eq 1 ]]; then
-    FORWARD_ARGS+=(--uninstall)
   fi
 }
 

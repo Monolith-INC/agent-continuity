@@ -4,7 +4,7 @@
 [![Tag](https://img.shields.io/github/v/tag/Monolith-INC/agent-continuity?label=latest%20tag)](https://github.com/Monolith-INC/agent-continuity/tags)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-1f6feb?logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
 [![Obsidian](https://img.shields.io/badge/Obsidian-vault%20native-7c3aed?logo=obsidian&logoColor=white)](https://obsidian.md/)
-[![Version](https://img.shields.io/badge/plugin-v0.12.1-0ea5e9)](./.plugin/plugin.json)
+[![Version](https://img.shields.io/badge/plugin-v0.12.2-0ea5e9)](./.plugin/plugin.json)
 
 **Durable knowledge for coding agents.** Pair your repository with an Obsidian vault so agents keep orientation, tickets, style, and architecture context across sessions—instead of rediscovering the project every time.
 
@@ -256,6 +256,16 @@ curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/
 ```
 
 From a clone: `./adapters/<host>/install.sh`.
+
+
+### Uninstall
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+Use `adapters/cursor/uninstall.sh` or `adapters/codex/uninstall.sh` for those hosts.
 
 ### Claude marketplace (also supported)
 

@@ -6,31 +6,39 @@ Use **adapters** only when you need host-native marketplace trees, vendor-prefix
 
 | Host | Builder | Manifest directory | User install |
 | --- | --- | --- | --- |
-| Cursor | `adapters/cursor/build_plugin.py` | `.cursor-plugin/` | `adapters/cursor/install.sh` |
-| Claude Code | `adapters/claude/build_plugin.py` | `.claude-plugin/` | `adapters/claude/install.sh` |
-| Codex | `adapters/codex/build_plugin.py` | `.codex-plugin/` | `adapters/codex/install.sh` |
+| Cursor | `adapters/cursor/build_plugin.py` | `.cursor-plugin/` | `install.sh` / `uninstall.sh` |
+| Claude Code | `adapters/claude/build_plugin.py` | `.claude-plugin/` | `install.sh` / `uninstall.sh` |
+| Codex | `adapters/codex/build_plugin.py` | `.codex-plugin/` | `install.sh` / `uninstall.sh` |
 
 ## End-user install (primary path)
 
-Commands for this repo (`theocarranza/agent-continuity`):
+Commands for this repo (`Monolith-INC/agent-continuity`):
 
 ```bash
 # Cursor -> ~/.cursor/plugins/local/<plugin>
-curl -fsSL https://raw.githubusercontent.com/theocarranza/agent-continuity/main/adapters/cursor/install.sh \
-  | bash -s -- --repo theocarranza/agent-continuity --ref main
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 
 # Claude Code -> durable marketplace + claude plugin install
-curl -fsSL https://raw.githubusercontent.com/theocarranza/agent-continuity/main/adapters/claude/install.sh \
-  | bash -s -- --repo theocarranza/agent-continuity --ref main
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 
 # Codex -> durable marketplace + codex plugin add
-curl -fsSL https://raw.githubusercontent.com/theocarranza/agent-continuity/main/adapters/codex/install.sh \
-  | bash -s -- --repo theocarranza/agent-continuity --ref main
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
 
-Forks: replace `theocarranza/agent-continuity` with `OWNER/REPO`.
+Forks: replace `Monolith-INC/agent-continuity` with `OWNER/REPO`.
 
-From a clone: `./adapters/<host>/install.sh`. Shared helpers live in `adapters/_install_lib.sh` and `adapters/_install_lib.py`.
+Uninstall:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+
+From a clone: `./adapters/<host>/install.sh` or `./adapters/<host>/uninstall.sh`. Shared helpers: `_install_lib.sh`, `_uninstall_lib.sh`, `_install_lib.py`.
 
 ## Build flow
 

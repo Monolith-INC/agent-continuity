@@ -26,7 +26,7 @@ codex plugin add agent-continuity@agent-continuity-local
 
 Restart Codex or start a new thread, then invoke `/agent-continuity:query-vault`.
 
-Flags: `--dry-run`, `--uninstall`, `--prefix DIR` (copies marketplace only; prints CLI commands and skips registration).
+Flags: `--dry-run`, `--prefix DIR`. Uninstall: `adapters/<host>/uninstall.sh`. (copies marketplace only; prints CLI commands and skips registration).
 
 ## Authoring / build
 

@@ -1,9 +1,13 @@
 # Changelog
 
+## 0.12.2
+
+- Dedicated `adapters/<host>/uninstall.sh`; removed `--uninstall` from `install.sh`.
+
 ## 0.12.1
 
 - Install script upgrades in one command (replaces prior managed install).
-- Document single curl install; `--uninstall` is remove-only.
+- Dedicated `adapters/<host>/uninstall.sh` (no `--uninstall` on install.sh).
 
 ## 0.12.0
 
