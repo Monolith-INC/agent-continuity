@@ -106,7 +106,7 @@ Chat history is not a knowledge base. A pile of `.md` files without conventions 
 ```mermaid
 flowchart LR
   subgraph Repo["Code repository"]
-    Code[Source + CLAUDE.md]
+    Code["Source + CLAUDE.md"]
     Rules[".agent/rules"]
   end
 
@@ -116,18 +116,19 @@ flowchart LR
   end
 
   subgraph Vault["Obsidian vault"]
-    Orient[README + Agent_Orientation]
-    Tickets[Tickets / Features]
+    Orient["README + Agent_Orientation"]
+    Tickets["Tickets / Features"]
     Knowledge[Knowledge]
     Bases[".base dashboards"]
   end
 
   Code --> Hooks
-  Hooks -->|SessionStart injects| Orient
-  Hooks -->|allowlist + naming| Vault
-  Skills -->|scaffold / mine / query / lint| Vault
+  Hooks -->|"SessionStart"| Orient
+  Hooks --> Tickets
+  Skills --> Tickets
+  Skills --> Knowledge
   Skills --> Rules
-  Bases -->|obsidian CLI| Skills
+  Bases -->|"obsidian CLI"| Skills
 ```
 
 ---
