@@ -11,3 +11,9 @@ __pycache__/
 dist/
 __pycache__/
 *.py[cod]
+
+# Codex marketplace index (override global **/.agents/ ignore)
+.agents/
+!.agents/
+!.agents/plugins/
+!.agents/plugins/marketplace.json
