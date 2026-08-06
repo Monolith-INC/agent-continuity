@@ -21,7 +21,7 @@ FIXED_ZIP_TIME = (2026, 8, 5, 0, 0, 0)
 IGNORE_NAMES = frozenset({"__pycache__", ".git", "dist", "adapters", ".github"})
 AUTHORING_SCRIPTS = frozenset({"validate.sh", "build_all.sh"})
 OVERLAY_SKILL = "query-vault"
-SHIPPED_TREES = ("skills", "hooks", "archetypes", "references", "examples")
+SHIPPED_TREES = ("skills", "hooks", "archetypes", "references", "examples", "assets")
 
 
 @dataclass(frozen=True)

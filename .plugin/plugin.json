@@ -8,6 +8,7 @@
   "homepage": "https://github.com/Monolith-INC/agent-continuity",
   "repository": "https://github.com/Monolith-INC/agent-continuity",
   "license": "MIT",
+  "logo": "assets/logo.png",
   "keywords": [
     "obsidian",
     "agent-memory",
