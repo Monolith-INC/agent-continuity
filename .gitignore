@@ -7,3 +7,7 @@
 # Python bytecode
 __pycache__/
 *.pyc
+
+dist/
+__pycache__/
+*.py[cod]

@@ -1,0 +1,35 @@
+{
+  "name": "agent-continuity",
+  "version": "0.12.0",
+  "description": "Keeps coding agents continuous across sessions—Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint. (Claude Code edition).",
+  "author": {
+    "name": "Théo Carranza"
+  },
+  "homepage": "https://github.com/Monolith-INC/agent-continuity",
+  "repository": "https://github.com/Monolith-INC/agent-continuity",
+  "license": "MIT",
+  "keywords": [
+    "obsidian",
+    "agent-memory",
+    "knowledge-base",
+    "hooks",
+    "continuity",
+    "claude-code"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Agent Continuity",
+    "shortDescription": "Durable Obsidian knowledge vaults for coding agents",
+    "longDescription": "Keeps coding agents continuous across sessions—Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint.",
+    "developerName": "Théo Carranza",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Initialize an Agent Continuity vault for this project.",
+      "Query the continuity vault for open tickets."
+    ]
+  }
+}

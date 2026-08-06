@@ -4,16 +4,28 @@
 [![Tag](https://img.shields.io/github/v/tag/Monolith-INC/agent-continuity?label=latest%20tag)](https://github.com/Monolith-INC/agent-continuity/tags)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-1f6feb?logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
 [![Obsidian](https://img.shields.io/badge/Obsidian-vault%20native-7c3aed?logo=obsidian&logoColor=white)](https://obsidian.md/)
-[![Version](https://img.shields.io/badge/plugin-v0.11.1-0ea5e9)](./agent-continuity/.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/plugin-v0.12.0-0ea5e9)](./.plugin/plugin.json)
 
 **Durable knowledge for coding agents.** Pair your repository with an Obsidian vault so agents keep orientation, tickets, style, and architecture context across sessions—instead of rediscovering the project every time.
+
+```bash
+# Claude Code (recommended)
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Cursor
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+Claude alternative (marketplace add from this repo):
 
 ```text
 /plugin marketplace add Monolith-INC/agent-continuity
 /plugin install agent-continuity@agent-continuity
 ```
 
-Then `/reload-plugins` (or restart Claude Code).
+Then `/reload-plugins` (or restart Claude Code / Reload Window in Cursor).
 
 ---
 
@@ -225,12 +237,34 @@ flowchart TD
 
 ## Installation
 
+### One-command install
+
+```bash
+# Claude Code
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Cursor
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+
+# Codex
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+From a clone: `./adapters/<host>/install.sh`.
+
+### Claude marketplace (also supported)
+
+This repo is a flat Open Plugins package. The root `.claude-plugin/marketplace.json` points at `./`, so GitHub marketplace add still works:
+
 ```text
 /plugin marketplace add Monolith-INC/agent-continuity
 /plugin install agent-continuity@agent-continuity
 ```
 
-Open `/hooks` or restart Claude Code so SessionStart / PreToolUse hooks attach to the current session.
+Open `/hooks` or restart the host so SessionStart / PreToolUse hooks attach to the current session.
 
 ### Dependencies
 
@@ -278,7 +312,7 @@ Optional project file: `.claude/agent-continuity.config.json`
 }
 ```
 
-See [`agent-continuity/examples/agent-continuity.config.example.json`](./agent-continuity/examples/agent-continuity.config.example.json).
+See [`examples/agent-continuity.config.example.json`](./examples/agent-continuity.config.example.json).
 
 **Legacy (still read):** `.claude/codex-workflow.config.json`, `codex.folder` / `codex.bootstrap`, marker `.codex-vault.json`.
 
@@ -286,27 +320,32 @@ See [`agent-continuity/examples/agent-continuity.config.example.json`](./agent-c
 
 ## What the plugin package contains
 
+Flat Open Plugins layout (repo root = plugin):
+
 ```text
-agent-continuity/                 ← this marketplace repo
-├── .claude-plugin/marketplace.json
-├── agent-continuity/             ← the Claude Code plugin
-│   ├── .claude-plugin/plugin.json
-│   ├── hooks/                    ← SessionStart + PreToolUse
-│   ├── skills/                   ← ten interactive skills
-│   ├── archetypes/               ← four vault specs + marker contract
-│   ├── scripts/vault-lint.py     ← deterministic structural scanner
-│   ├── references/               ← frontmatter convention
-│   ├── docs/obsidian-leverage.md ← Obsidian skills leverage map
-│   └── examples/                 ← config example
-└── README.md                     ← you are here
+agent-continuity/
+├── .plugin/plugin.json           ← Open Plugins manifest
+├── .claude-plugin/               ← Claude marketplace + plugin manifests
+│   ├── marketplace.json          ← source: ./
+│   └── plugin.json
+├── hooks/                        ← SessionStart + PreToolUse
+├── skills/                       ← ten interactive skills
+├── archetypes/                   ← four vault specs + marker contract
+├── scripts/vault-lint.py         ← deterministic structural scanner
+├── references/                   ← frontmatter convention
+├── examples/                     ← config example
+├── adapters/                     ← Cursor / Claude / Codex build + curl install
+├── docs/
+└── README.md
 ```
 
 Deep dives:
 
-- [Plugin package README](./agent-continuity/README.md) — hooks internals, layout, roadmap history  
-- [Vault archetypes](./agent-continuity/archetypes/README.md)  
-- [Frontmatter convention](./agent-continuity/references/frontmatter-convention.md)  
-- [Obsidian leverage map](./agent-continuity/docs/obsidian-leverage.md)
+- [Former package README](./docs/plugin-package-readme.md) — hooks internals, layout, roadmap history  
+- [Vault archetypes](./archetypes/README.md)  
+- [Frontmatter convention](./references/frontmatter-convention.md)  
+- [Obsidian leverage map](./docs/obsidian-leverage.md)  
+- [Host matrix](./docs/HOST_MATRIX.md)
 
 ---
 
@@ -337,7 +376,7 @@ Deep dives:
 
 ## Versioning & releases
 
-Plugin version is declared in [`agent-continuity/.claude-plugin/plugin.json`](./agent-continuity/.claude-plugin/plugin.json) and mirrored in the marketplace manifest. Release tags follow `agent-continuity--vX.Y.Z`.
+Plugin version is declared in [`VERSION`](./VERSION), [`.plugin/plugin.json`](./.plugin/plugin.json), and the Claude marketplace/plugin manifests (lockstep-checked by `scripts/validate.sh`). Release tags follow `agent-continuity--vX.Y.Z`.
 
 ---
 

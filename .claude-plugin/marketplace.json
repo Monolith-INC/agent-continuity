@@ -1,15 +1,15 @@
 {
   "name": "agent-continuity",
   "owner": {
-    "name": "Th\u00e9o Carranza"
+    "name": "Théo Carranza"
   },
-  "description": "Agent Continuity \u2014 durable Obsidian knowledge vaults for coding agents (hooks, skills, archetypes).",
+  "description": "Agent Continuity — durable Obsidian knowledge vaults for coding agents (hooks, skills, archetypes).",
   "plugins": [
     {
       "name": "agent-continuity",
-      "source": "./agent-continuity",
-      "description": "Keeps coding agents continuous across sessions\u2014Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint.",
-      "version": "0.11.1"
+      "source": "./",
+      "description": "Keeps coding agents continuous across sessions—Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint.",
+      "version": "0.12.0"
     }
   ]
 }

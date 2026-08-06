@@ -1,13 +1,13 @@
 {
   "name": "agent-continuity",
-  "displayName": "Agent Continuity",
-  "version": "0.11.1",
-  "description": "Keeps coding agents continuous across sessions\u2014Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint.",
+  "version": "0.12.0",
+  "description": "Keeps coding agents continuous across sessions—Obsidian vault as durable memory, with bootstrap hooks, convention guardrails, and skills to scaffold, mine, query, and lint.",
   "author": {
-    "name": "Th\u00e9o Carranza"
+    "name": "Théo Carranza"
   },
   "homepage": "https://github.com/Monolith-INC/agent-continuity",
   "repository": "https://github.com/Monolith-INC/agent-continuity",
+  "license": "MIT",
   "keywords": [
     "obsidian",
     "agent-memory",
