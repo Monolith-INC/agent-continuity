@@ -8,25 +8,50 @@
 
 **Durable knowledge for coding agents.** Pair your repository with an Obsidian vault so agents keep orientation, tickets, style, and architecture context across sessions—instead of rediscovering the project every time.
 
+### Claude Code
+
+Install:
+
 ```bash
-# Claude Code (recommended)
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
 
-# Cursor
-curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
-  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+Uninstall:
 
-# Uninstall
-# Claude Code
+```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
 
-# Cursor
+### Cursor
+
+Install:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+Uninstall:
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
 
-# Codex
+### Codex
+
+Install:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+Uninstall:
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
@@ -250,44 +275,55 @@ flowchart TD
 
 ## Installation
 
-### One-command install
+One command upgrades in place (replaces any prior managed install). From a clone: `./adapters/<host>/install.sh` or `./adapters/<host>/uninstall.sh`.
 
-One command upgrades in place (replaces any prior managed install).
+### Claude Code
+
+Install:
 
 ```bash
-# Claude Code
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
 
-# Cursor
+Uninstall:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+### Cursor
+
+Install:
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
 
-# Codex
+Uninstall:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/uninstall.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+### Codex
+
+Install:
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
 
-From a clone: `./adapters/<host>/install.sh`.
-
-
-### Uninstall
+Uninstall:
 
 ```bash
-# Claude Code
-curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/uninstall.sh \
-  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
-
-# Cursor
-curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/uninstall.sh \
-  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
-
-# Codex
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
-
-From a clone: `./adapters/<host>/uninstall.sh`.
 
 ### Claude marketplace (also supported)
 
@@ -299,6 +335,7 @@ This repo is a flat Open Plugins package. The root `.claude-plugin/marketplace.j
 ```
 
 Open `/hooks` or restart the host so SessionStart / PreToolUse hooks attach to the current session.
+
 
 ### Dependencies
 

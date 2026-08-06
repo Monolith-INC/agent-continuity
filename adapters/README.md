@@ -12,42 +12,60 @@ Use **adapters** only when you need host-native marketplace trees, vendor-prefix
 
 ## End-user install (primary path)
 
-Commands for this repo (`Monolith-INC/agent-continuity`):
+Plain install upgrades in place. Each host has its own copy-paste blocks.
+
+### Claude Code
+
+Install:
 
 ```bash
-# Cursor -> ~/.cursor/plugins/local/<plugin>
-curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
-  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
-
-# Claude Code -> durable marketplace + claude plugin install
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/install.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
-
-# Codex -> durable marketplace + codex plugin add
-curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/install.sh \
-  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
-
-Forks: replace `Monolith-INC/agent-continuity` with `OWNER/REPO`.
 
 Uninstall:
 
 ```bash
-# Claude Code
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/claude/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
 
-# Cursor
+### Cursor
+
+Install:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+Uninstall:
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/cursor/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
 
-# Codex
+### Codex
+
+Install:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/install.sh \
+  | bash -s -- --repo Monolith-INC/agent-continuity --ref main
+```
+
+Uninstall:
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Monolith-INC/agent-continuity/main/adapters/codex/uninstall.sh \
   | bash -s -- --repo Monolith-INC/agent-continuity --ref main
 ```
 
-
 From a clone: `./adapters/<host>/install.sh` or `./adapters/<host>/uninstall.sh`. Shared helpers: `_install_lib.sh`, `_uninstall_lib.sh`, `_install_lib.py`.
+
+Forks: replace `Monolith-INC/agent-continuity` with `OWNER/REPO`.
+
 
 ## Build flow
 
