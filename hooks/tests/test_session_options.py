@@ -14,7 +14,7 @@ from pathlib import Path
 HOOKS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HOOKS / "scripts"))
 
-from session_options import build_menu, is_unfinished, recent_records  # noqa: E402
+from session_options import build_menu, is_unfinished, read_status, recent_records  # noqa: E402
 
 OLD = "2026-11-10-090000-old-work"
 MID = "2026-11-12-101500-mid-work"
@@ -25,9 +25,10 @@ def write(folder: Path, name: str, body: str) -> None:
     (folder / f"{name}.md").write_text(body, encoding="utf-8")
 
 
-def record(title: str, forward: str = "") -> str:
+def record(title: str, forward: str = "", status: str = "") -> str:
     link = f"\nNext: [[{forward}]]\n" if forward else ""
-    return f"---\ndate: 2026-11-13\ntype: session\n---\n\n# {title}\n{link}"
+    state = f"status: {status}\n" if status else ""
+    return f"---\ndate: 2026-11-13\ntype: session\n{state}---\n\n# {title}\n{link}"
 
 
 class RecentRecordsTests(unittest.TestCase):
@@ -68,6 +69,42 @@ class UnfinishedTests(unittest.TestCase):
         self.assertFalse(is_unfinished(MID, f"Next: [[Agent_Sessions/{NEW}|next]]"))
 
 
+class StatusTests(unittest.TestCase):
+    def test_status_is_read_from_frontmatter(self) -> None:
+        self.assertEqual(read_status(record("Mid", status="ongoing")), "ongoing")
+        self.assertEqual(read_status(record("Mid", status="Closed")), "closed")
+
+    def test_unknown_or_missing_status_reads_as_empty(self) -> None:
+        self.assertEqual(read_status(record("Mid")), "")
+        self.assertEqual(read_status(record("Mid", status="paused")), "")
+        self.assertEqual(read_status("status: ongoing\n# not frontmatter"), "")
+
+    def test_explicit_status_wins_over_forward_link_rule(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            write(folder, MID, record("Mid", forward=NEW, status="ongoing"))
+            write(folder, NEW, record("New", status="closed"))
+            states = {r.name: r.status for r in recent_records(folder, 3)}
+            self.assertEqual(states, {NEW: "closed", MID: "ongoing"})
+
+    def test_missing_status_falls_back_to_forward_link_rule(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            write(folder, MID, record("Mid", forward=NEW))
+            write(folder, NEW, record("New"))
+            states = {r.name: r.status for r in recent_records(folder, 3)}
+            self.assertEqual(states, {NEW: "ongoing", MID: "closed"})
+
+    def test_archived_records_are_left_out_and_do_not_use_up_the_limit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            write(folder, OLD, record("Old", status="closed"))
+            write(folder, MID, record("Mid", status="archived"))
+            write(folder, NEW, record("New", status="ongoing"))
+            names = tuple(r.name for r in recent_records(folder, 2))
+            self.assertEqual(names, (NEW, OLD))
+
+
 class MenuTests(unittest.TestCase):
     def test_no_records_yields_empty_menu(self) -> None:
         self.assertEqual(build_menu(()), "")
@@ -79,8 +116,8 @@ class MenuTests(unittest.TestCase):
             write(folder, MID, record("Mid", forward=NEW))
             write(folder, NEW, record("New"))
             menu = build_menu(recent_records(folder, 3))
-            self.assertIn("1. Resume the most recent unfinished session", menu)
-            self.assertIn(f"{NEW} (New)", menu)
+            self.assertIn("1. Resume the most recent ongoing session", menu)
+            self.assertIn(f"{NEW} (New) [ongoing]", menu)
             self.assertIn("2. Pick a recent session (last 3, newest first)", menu)
             self.assertIn(f"{MID} (Mid) [closed]", menu)
             self.assertIn("3. Start fresh", menu)

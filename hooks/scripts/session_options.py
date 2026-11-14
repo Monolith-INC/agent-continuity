@@ -7,8 +7,11 @@ Prints a short menu (resume the newest unfinished session, pick one of the
 last few, or start fresh) for the agent to show the user. Prints nothing when
 the folder holds no session records, so the hook stays silent.
 
-A record is "unfinished" when it has no wikilink forward to a newer record.
-Records are named YYYY-MM-DD-HHMMSS-slug, so name order is time order.
+Each record carries `status: ongoing | closed | archived` in its frontmatter.
+Archived records are left out of the menu. A record without a valid status
+falls back to the older rule: it is ongoing when it has no wikilink forward to
+a newer record. Records are named YYYY-MM-DD-HHMMSS-slug, so name order is
+time order.
 """
 
 from __future__ import annotations
@@ -16,11 +19,16 @@ from __future__ import annotations
 import re
 import sys
 from dataclasses import dataclass
+from itertools import islice
 from pathlib import Path
+from typing import Iterator
 
 RECORD_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}-\d{6}-[a-z0-9-]+$")
 WIKILINK = re.compile(r"\[\[([^\]|#]+)")
 HEADING = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
+FRONTMATTER = re.compile(r"^\ufeff?---\s*\n(.*?)\n---\s*(\n|$)", re.S)
+STATUS_LINE = re.compile(r"^status\s*:\s*['\"]?([A-Za-z]+)['\"]?\s*$", re.MULTILINE)
+STATUSES = ("ongoing", "closed", "archived")
 DEFAULT_RECENT = 3
 
 
@@ -28,7 +36,11 @@ DEFAULT_RECENT = 3
 class SessionRecord:
     name: str
     title: str
-    unfinished: bool
+    status: str
+
+    @property
+    def unfinished(self) -> bool:
+        return self.status == "ongoing"
 
 
 def slug_title(name: str) -> str:
@@ -43,34 +55,47 @@ def is_unfinished(name: str, text: str) -> bool:
     return not any(RECORD_NAME.match(link) and link > name for link in linked_names(text))
 
 
+def read_status(text: str) -> str:
+    block = FRONTMATTER.match(text)
+    found = STATUS_LINE.search(block.group(1)) if block else None
+    value = found.group(1).lower() if found else ""
+    return value if value in STATUSES else ""
+
+
 def read_record(path: Path) -> SessionRecord:
     text = path.read_text(encoding="utf-8", errors="replace")
     heading = HEADING.search(text)
+    fallback = "ongoing" if is_unfinished(path.stem, text) else "closed"
     return SessionRecord(
         name=path.stem,
         title=heading.group(1) if heading else slug_title(path.stem),
-        unfinished=is_unfinished(path.stem, text),
+        status=read_status(text) or fallback,
     )
 
 
-def recent_records(folder: Path, limit: int) -> tuple[SessionRecord, ...]:
-    candidates = sorted(
+def all_records(folder: Path) -> Iterator[SessionRecord]:
+    """Every record, newest first, read lazily so callers can stop early."""
+    paths = sorted(
         (p for p in folder.glob("*.md") if RECORD_NAME.match(p.stem)),
         key=lambda p: p.stem,
         reverse=True,
     ) if folder.is_dir() else []
-    return tuple(read_record(p) for p in candidates[: max(limit, 0)])
+    return (read_record(p) for p in paths)
+
+
+def recent_records(folder: Path, limit: int) -> tuple[SessionRecord, ...]:
+    live = (r for r in all_records(folder) if r.status != "archived")
+    return tuple(islice(live, max(limit, 0)))
 
 
 def describe(record: SessionRecord) -> str:
-    state = "" if record.unfinished else " [closed]"
-    return f"{record.name} ({record.title}){state}"
+    return f"{record.name} ({record.title}) [{record.status}]"
 
 
 def build_menu(records: tuple[SessionRecord, ...]) -> str:
     unfinished = next((r for r in records if r.unfinished), None)
     resume = (
-        (f"Resume the most recent unfinished session: {describe(unfinished)}",)
+        (f"Resume the most recent ongoing session: {describe(unfinished)}",)
         if unfinished else ()
     )
     pick = (

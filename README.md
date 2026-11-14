@@ -165,13 +165,19 @@ sequenceDiagram
 
 1. **`SessionStart` — orientation injection**  
    Loads vault `README.md` + `Knowledge/Agent_Orientation.md` (configurable) into session context so every run starts oriented.  
-   Then appends a **session start menu** built from the newest `Agent_Sessions/` records (default 3): resume the most recent unfinished session, pick a recent one, or start fresh. A record counts as unfinished when it has no wikilink forward to a newer record. Tune or turn off with `vault.sessionOptions` (`recent`, `enabled`, `folder`).
+   Then appends a **session start menu** built from the newest `Agent_Sessions/` records (default 3): resume the most recent ongoing session, pick a recent one, or start fresh. Each record's `status` frontmatter (`ongoing` / `closed` / `archived`) drives it; archived records are hidden. Records without a status count as ongoing when they have no wikilink forward to a newer record. Tune or turn off with `vault.sessionOptions` (`recent`, `enabled`, `folder`).
 
 2. **`PreToolUse(Read|Grep)` — markdown allowlist**  
    Blocks casual reads of project `.md` outside a small allowlist and the vault. Pushes agents toward the vault / Bases instead of scraping every doc.
 
 3. **`PreToolUse(Write)` — archetype naming enforcement**  
-   Inside a marked vault, denies writes whose **filename shape** or **frontmatter keys** violate the archetype spec. Fail-open outside marked vaults.
+   Inside a marked vault, denies writes whose **filename shape**, **frontmatter keys**, or **enum values** (such as a session's `status`) violate the archetype spec. Fail-open outside marked vaults.
+
+4. **`Stop` — session registry freshness**  
+   When project files changed after the ongoing session record was last written, blocks the end of the turn once and asks the agent to append an Implementation Checkpoint (or a Decision entry). With no ongoing record, asks it to open one. Never blocks twice in a row.
+
+5. **`UserPromptSubmit` — decision reminder**  
+   While a record is ongoing, adds one line reminding the agent to log a `## Decision` entry if the user's message settles one. Turn 4 and 5 off with `vault.freshness.enabled: false`.
 
 ### Skills (interactive, confirm-before-write)
 

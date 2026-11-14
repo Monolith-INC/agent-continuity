@@ -169,13 +169,21 @@
       "match": "Agent_Sessions/**",
       "required": [
         "date",
-        "type"
+        "type",
+        "status"
       ],
       "optional": [
         "tags",
         "ticket"
       ],
-      "forbidden": []
+      "forbidden": [],
+      "values": {
+        "status": [
+          "ongoing",
+          "closed",
+          "archived"
+        ]
+      }
     },
     {
       "match": "Knowledge/**",

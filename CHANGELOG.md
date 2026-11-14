@@ -2,9 +2,12 @@
 
 ## 0.13.0
 
-- SessionStart now offers a start menu built from the newest `Agent_Sessions/` records: resume the most recent unfinished session, pick a recent one, or start fresh. A record is unfinished when it has no wikilink forward to a newer record.
-- New `hooks/scripts/session_options.py` with tests in `hooks/tests/`, run in CI.
-- New optional config `vault.sessionOptions` (`enabled`, `recent` default 3, `folder` default `Agent_Sessions`).
+- SessionStart now offers a start menu built from the newest `Agent_Sessions/` records: resume the most recent ongoing session, pick a recent one, or start fresh.
+- Session records carry an explicit `status: ongoing | closed | archived` (now required for new writes in the `software-project` archetype). Archived records are hidden from the menu. Older records without a status fall back to the forward-link rule.
+- The naming hook checks enum values through an optional `values` map in archetype frontmatter rules.
+- New `Stop` hook asks the agent to checkpoint the ongoing session record when project files changed after it was last written. New `UserPromptSubmit` hook reminds it to log `## Decision` entries. Both live in `hooks/scripts/session_freshness.py`; turn them off with `vault.freshness.enabled: false`.
+- New `hooks/scripts/session_options.py`; tests for all new hook behavior in `hooks/tests/`, run in CI.
+- New optional config `vault.sessionOptions` (`enabled`, `recent` default 3, `folder` default `Agent_Sessions`) and `vault.freshness` (`enabled`).
 - `init-workspace` session bootstrap steps now start from the menu instead of reading the two newest records.
 
 ## 0.12.3

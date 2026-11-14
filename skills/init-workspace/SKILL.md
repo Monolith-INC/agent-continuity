@@ -57,9 +57,11 @@ Markdown inside Agent Continuity vault is governed by the Session bootstrap rule
 ## Session bootstrap — run BEFORE any other work in a new session
 
 1. Read Agent Continuity `README.md` — defines vault layout and session-record format.
-2. Show the user the **Session start options** menu (resume the newest unfinished session, pick a recent one, or start fresh) and wait for their choice. Read only the record they pick.
-3. If the newest record is still open, close it per the README's protocol, then create a new record for this session with a **backlink** to the one just closed.
-4. Sessions form a doubly-linked chain: when closing any record, write a **forward link** to its successor. A record with no forward link is treated as unfinished by the start menu.
+2. Show the user the **Session start options** menu (resume the newest ongoing session, pick a recent one, or start fresh) and wait for their choice. Read only the record they pick.
+3. **Resume** → keep working in that record; it stays `status: ongoing`. **Pick or start fresh** → close any record still `ongoing` per the README's protocol, then create a new record for this session with `status: ongoing` and a **backlink** to the one just closed.
+4. Sessions form a doubly-linked chain: when closing any record, set `status: closed` and write a **forward link** to its successor.
+
+Every record carries `status` in its frontmatter: `ongoing` (work in progress), `closed` (finished), or `archived` (no longer relevant; hidden from the start menu). The naming hook rejects any other value. Records written before this rule have no `status`; the start menu treats those as ongoing when they have no forward link.
 
 A `SessionStart` hook (provided by the `agent-continuity` Claude Code plugin) injects the codex README + `Knowledge/Agent_Orientation.md` and builds the start menu from the newest `Agent_Sessions/` records automatically; acting on the choice and steps 3–4 are still on the agent. Without the hook, list the three newest records yourself and offer the same choices.
 
@@ -69,8 +71,11 @@ Open the record at the **first material edit** (not retroactively at the end). T
 
 - **`## Implementation Checkpoint - <timestamp>` — MUST.** At the end of every validated work unit. Body: `Scope` / `Changes` / `Validation`.
 - **`## Pre-Operation Snapshot - <timestamp>` — MUST.** Immediately before any state-disrupting action.
+- **`## Decision - <timestamp>` — MUST.** As soon as an important decision is settled (by the user or by you). Body: what was decided, the options weighed, and why.
 - **`## Pivot - <timestamp>` — SHOULD.** At tranche transitions or scope shifts.
 - **`## Heartbeat - <timestamp>` — safety net.** If 30 minutes pass without any of the above firing.
+
+Two plugin hooks back this up. A `Stop` hook blocks the end of a turn once when project files changed after the ongoing record was last written, asking for a checkpoint (or for a record to be opened if none is ongoing). A `UserPromptSubmit` hook adds a one-line reminder to log a `Decision` entry when the user's message settles one.
 
 ## Repository shape
 
