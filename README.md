@@ -4,7 +4,7 @@
 [![Tag](https://img.shields.io/github/v/tag/Monolith-INC/agent-continuity?label=latest%20tag)](https://github.com/Monolith-INC/agent-continuity/tags)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-1f6feb?logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
 [![Obsidian](https://img.shields.io/badge/Obsidian-vault%20native-7c3aed?logo=obsidian&logoColor=white)](https://obsidian.md/)
-[![Version](https://img.shields.io/badge/plugin-v0.12.3-0ea5e9)](./.plugin/plugin.json)
+[![Version](https://img.shields.io/badge/plugin-v0.13.0-0ea5e9)](./.plugin/plugin.json)
 
 **Durable knowledge for coding agents.** Pair your repository with an Obsidian vault so agents keep orientation, tickets, style, and architecture context across sessions—instead of rediscovering the project every time.
 
@@ -164,13 +164,20 @@ sequenceDiagram
 ```
 
 1. **`SessionStart` — orientation injection**  
-   Loads vault `README.md` + `Knowledge/Agent_Orientation.md` (configurable) into session context so every run starts oriented.
+   Loads vault `README.md` + `Knowledge/Agent_Orientation.md` (configurable) into session context so every run starts oriented.  
+   Then loads the session registry once into a small index (`<vault>/.agent-continuity/session-index.json`, git-ignored; only changed records are re-read) and appends a **session start menu** (default 3 recent records): resume the ongoing session, pick a recent one, or start fresh. Each record's `status` frontmatter (`ongoing` / `closed` / `archived`) drives it; archived records are hidden and only the newest record can be ongoing. The menu also handles a session past the 8-hour cap, a different checkout (the agent asks before resuming), and an unreadable record (the agent recovers from the last readable one without asking). Old-format records are upgraded automatically (apply, then report) when found or when the plugin version changed; see `reconcile-sessions`. The vault must sit inside the project: a setting pointing elsewhere is ignored, the default `AI_Codex*/` is used, and the agent asks for the right folder. Tune or turn off with `vault.sessionOptions` (`recent`, `enabled`, `folder`).
 
 2. **`PreToolUse(Read|Grep)` — markdown allowlist**  
    Blocks casual reads of project `.md` outside a small allowlist and the vault. Pushes agents toward the vault / Bases instead of scraping every doc.
 
 3. **`PreToolUse(Write)` — archetype naming enforcement**  
-   Inside a marked vault, denies writes whose **filename shape** or **frontmatter keys** violate the archetype spec. Fail-open outside marked vaults.
+   Inside a marked vault, denies writes whose **filename shape**, **frontmatter keys**, or **enum values** (such as a session's `status`) violate the archetype spec. Fail-open outside marked vaults.
+
+4. **`Stop` — session registry freshness**  
+   Compares the code with the git snapshot from the previous turn and blocks the end of the turn once when a checkpoint is due: first change to a file, a new commit, a commit rolled back or amended, or a push, unless the ongoing record was already updated. Also asks once to roll over a session older than 8 hours, to open a record when none is ongoing, and to recover from an unreadable record. Never blocks twice in a row.
+
+5. **`UserPromptSubmit` — decision reminder**  
+   While a record is ongoing, adds one line reminding the agent to log a `## Decision` entry if the user's message settles one. Reads only the index. Turn 4 and 5 off with `vault.freshness.enabled: false`.
 
 ### Skills (interactive, confirm-before-write)
 
@@ -238,6 +245,7 @@ Invoke as `/agent-continuity:<skill>`.
 | Skill | Purpose | When to use | What to expect |
 | --- | --- | --- | --- |
 | **`research-ingest`** | Fetch a URL with Defuddle → source-stamped `Knowledge/` reference note | Capturing an external spec/article into the vault with provenance | `type: reference` note + frontmatter (`source`/`domain`/`retrieved`) + index-friendly shape |
+| **`reconcile-sessions`** | Upgrade old-format session records and refresh the session index | Start menu reports old-format records, or older notes were imported | Adds `status` / `date` / `type`, keeps one `ongoing`, adds forward links; originals backed up under `.agent-continuity/backups/` |
 | **`vault-lint`** | Audit vault vs archetype; propose/fix drift | Legacy vault, rename mess, or pre-archetype notes | Structural report (filenames, frontmatter, strays, duplicate ticket ids) + semantic pass; `git mv` + wikilink repair on confirm |
 
 ---
@@ -289,6 +297,8 @@ flowchart TD
 ## Installation
 
 One command upgrades in place (replaces any prior managed install). From a clone: `./adapters/<host>/install.sh` or `./adapters/<host>/uninstall.sh`.
+
+After an install or upgrade, the first session in each project upgrades any old-format session records automatically. To do it right away for one project, add `--project <folder>` to the install command.
 
 Root marketplace indexes (for GitHub / team import):
 

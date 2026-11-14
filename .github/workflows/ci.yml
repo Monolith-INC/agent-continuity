@@ -14,6 +14,8 @@ jobs:
           python-version: "3.12"
       - name: Validate lockstep and skill frontmatter
         run: ./scripts/validate.sh
+      - name: Hook tests
+        run: python3 -m unittest discover -s hooks/tests -v
       - name: Adapter packaging tests
         run: python3 -m unittest discover -s adapters/tests -v
       - name: Build all host marketplaces

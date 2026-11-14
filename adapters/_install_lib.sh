@@ -9,6 +9,7 @@ PLUGIN_INSTALL_REF="${PLUGIN_INSTALL_REF:-main}"
 INSTALL_DRY_RUN=0
 INSTALL_PREFIX=""
 INSTALL_ROOT_OVERRIDE=""
+INSTALL_PROJECT=""
 FORWARD_ARGS=()
 
 usage() {
@@ -29,6 +30,8 @@ Options:
   --ref REF           Git ref (default: main, or \$PLUGIN_INSTALL_REF)
   --prefix DIR        Override install root (skips host CLI registration)
   --root DIR          Use an existing checkout instead of cloning
+  --project DIR       Also upgrade that project's old-format session records now
+                      (otherwise the first session after install does it)
   --dry-run           Print the plan without changing files
   -h, --help          Show this help
 
@@ -62,6 +65,10 @@ parse_install_args() {
         ;;
       --root)
         INSTALL_ROOT_OVERRIDE="${2:-}"
+        shift 2
+        ;;
+      --project)
+        INSTALL_PROJECT="${2:-}"
         shift 2
         ;;
       --dry-run)
@@ -151,6 +158,9 @@ build_python_args() {
   fi
   if [[ "$INSTALL_DRY_RUN" -eq 1 ]]; then
     FORWARD_ARGS+=(--dry-run)
+  fi
+  if [[ -n "$INSTALL_PROJECT" ]]; then
+    FORWARD_ARGS+=(--project "$INSTALL_PROJECT")
   fi
 }
 

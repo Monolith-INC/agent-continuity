@@ -14,6 +14,9 @@ A fact lives in exactly one place.
   write `status: active` in frontmatter — the two will drift, and the folder wins
   anyway (it's what you move a note between). Bases derive the status lane from the
   parent folder.
+- **Exception: session records.** `Agent_Sessions/` is a flat, time-ordered folder, so a
+  record's state lives in frontmatter as `status: ongoing | closed | archived`. The
+  start menu and the freshness hooks read it, and the naming hook rejects other values.
 - **Identity and classification are frontmatter.** A ticket number, what kind of note
   it is, what area it touches — none of that is encoded by where the file sits, so it
   goes in frontmatter.

@@ -8,8 +8,8 @@ via a vault marker (written by init-vault). Outside such a vault it is a silent 
 Marker (preferred): .agent-continuity-vault.json
 Legacy fallback:    .codex-vault.json
 
-It enforces only what regex/sets can decide — filename SHAPE and required/forbidden
-frontmatter keys — per the active archetype spec in ../archetypes/<type>.json. Semantic
+It enforces only what regex/sets can decide — filename SHAPE, required/forbidden
+frontmatter keys, and allowed values for enum keys (a rule's optional "values" map) — per the active archetype spec in ../archetypes/<type>.json. Semantic
 issues (language, near-duplicates, stray files) are the linter's job, not this hook's.
 
 Disable per project via .claude/agent-continuity.config.json
@@ -138,13 +138,15 @@ def main():
 
     # Frontmatter keys: parse the leading --- block of the content being written.
     fm_keys = set()
+    fm_values = {}
     content = (data.get("tool_input") or {}).get("content", "")
     m = re.match(r"^﻿?---\s*\n(.*?)\n---\s*(\n|$)", content, re.S)
     if m:
         for line in m.group(1).splitlines():
-            mm = re.match(r"^([A-Za-z0-9_-]+)\s*:", line)
+            mm = re.match(r"^([A-Za-z0-9_-]+)\s*:\s*(.*?)\s*$", line)
             if mm:
                 fm_keys.add(mm.group(1))
+                fm_values[mm.group(1)] = mm.group(2).strip("'\"")
 
     fmrule = None
     for fr in spec.get("frontmatter", []):
@@ -154,12 +156,19 @@ def main():
     if fmrule:
         missing = [k for k in fmrule.get("required", []) if k not in fm_keys]
         forbidden = [k for k in fmrule.get("forbidden", []) if k in fm_keys]
-        if missing or forbidden:
+        invalid = [
+            f"{k}={fm_values[k]!r} (allowed: {', '.join(allowed)})"
+            for k, allowed in fmrule.get("values", {}).items()
+            if k in fm_values and fm_values[k] not in allowed
+        ]
+        if missing or forbidden or invalid:
             parts = []
             if missing:
                 parts.append("missing required key(s): " + ", ".join(missing))
             if forbidden:
                 parts.append("forbidden key(s) present: " + ", ".join(forbidden))
+            if invalid:
+                parts.append("invalid value(s): " + "; ".join(invalid))
             deny(
                 f"agent-continuity frontmatter ({vtype}, {(reldir + '/') if reldir else 'root'}): "
                 + "; ".join(parts)

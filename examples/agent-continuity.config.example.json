@@ -5,7 +5,15 @@
     "bootstrap": [
       "README.md",
       "Knowledge/Agent_Orientation.md"
-    ]
+    ],
+    "sessionOptions": {
+      "enabled": true,
+      "recent": 3,
+      "folder": "Agent_Sessions"
+    },
+    "freshness": {
+      "enabled": true
+    }
   },
   "markdownAllowlist": {
     "patterns": [
