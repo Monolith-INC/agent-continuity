@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.0
+
+- SessionStart now offers a start menu built from the newest `Agent_Sessions/` records: resume the most recent unfinished session, pick a recent one, or start fresh. A record is unfinished when it has no wikilink forward to a newer record.
+- New `hooks/scripts/session_options.py` with tests in `hooks/tests/`, run in CI.
+- New optional config `vault.sessionOptions` (`enabled`, `recent` default 3, `folder` default `Agent_Sessions`).
+- `init-workspace` session bootstrap steps now start from the menu instead of reading the two newest records.
+
 ## 0.12.3
 
 - Codex marketplace fix: built adapters emit `.agents/plugins/marketplace.json` (Codex does not accept `.codex-plugin/` alone).

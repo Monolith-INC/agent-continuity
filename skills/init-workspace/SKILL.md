@@ -57,11 +57,11 @@ Markdown inside Agent Continuity vault is governed by the Session bootstrap rule
 ## Session bootstrap — run BEFORE any other work in a new session
 
 1. Read Agent Continuity `README.md` — defines vault layout and session-record format.
-2. Read the two newest records in `<vault>/Agent_Sessions/` (newest first), for continuity.
+2. Show the user the **Session start options** menu (resume the newest unfinished session, pick a recent one, or start fresh) and wait for their choice. Read only the record they pick.
 3. If the newest record is still open, close it per the README's protocol, then create a new record for this session with a **backlink** to the one just closed.
-4. Sessions form a doubly-linked chain: when closing any record, write a **forward link** to its successor.
+4. Sessions form a doubly-linked chain: when closing any record, write a **forward link** to its successor. A record with no forward link is treated as unfinished by the start menu.
 
-A `SessionStart` hook (provided by the `agent-continuity` Claude Code plugin) injects the codex README + `Knowledge/Agent_Orientation.md` automatically; steps 2–4 are still on the agent.
+A `SessionStart` hook (provided by the `agent-continuity` Claude Code plugin) injects the codex README + `Knowledge/Agent_Orientation.md` and builds the start menu from the newest `Agent_Sessions/` records automatically; acting on the choice and steps 3–4 are still on the agent. Without the hook, list the three newest records yourself and offer the same choices.
 
 ### Session record cadence — during work
 

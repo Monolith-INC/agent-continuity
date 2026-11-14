@@ -6,11 +6,17 @@
 #   .vault.folder / .codex.folder       — vault folder name (defaults to glob AI_Codex*/)
 #   .vault.bootstrap / .codex.bootstrap — relative paths to inject (defaults to
 #                                        README.md + Knowledge/Agent_Orientation.md)
+#   .vault.sessionOptions.enabled       — false turns off the start menu (default true)
+#   .vault.sessionOptions.recent        — how many recent sessions to list (default 3)
+#   .vault.sessionOptions.folder        — session records folder (default Agent_Sessions)
 #
 # Behavior:
 #   - If config exists, its values win.
 #   - If no config and no AI_Codex*/ folder found, the hook is a silent no-op.
-#   - Missing individual files are noted inline rather than aborting.
+#   - Missing individual files are silently skipped.
+#   - A "Session start options" menu built from the newest session records is
+#     appended (see session_options.py), so the agent can offer resume / pick /
+#     start fresh before any other work.
 
 set -euo pipefail
 
@@ -57,7 +63,21 @@ for f in "${files[@]}"; do
   [[ -f "$vault_root/$f" ]] && present_files+=("$f")
 done
 
-if [[ ${#present_files[@]} -eq 0 ]]; then
+menu=""
+options_enabled="true"
+recent="3"
+sessions_folder="Agent_Sessions"
+if [[ -n "$config" ]]; then
+  options_enabled="$(jq -r 'if .vault.sessionOptions.enabled == false then "false" else "true" end' "$config")"
+  recent="$(jq -r '.vault.sessionOptions.recent // 3' "$config")"
+  sessions_folder="$(jq -r '.vault.sessionOptions.folder // "Agent_Sessions"' "$config")"
+fi
+if [[ "$options_enabled" == "true" ]] && command -v python3 >/dev/null 2>&1; then
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  menu="$(python3 "$script_dir/session_options.py" "$vault_root/$sessions_folder" "$recent" 2>/dev/null || true)"
+fi
+
+if [[ ${#present_files[@]} -eq 0 ]] && [[ -z "$menu" ]]; then
   exit 0
 fi
 
@@ -68,6 +88,9 @@ context="$(
     printf '\n--- %s/%s ---\n' "$vault_folder" "$f"
     cat -- "$vault_root/$f"
   done
+  if [[ -n "$menu" ]]; then
+    printf '\n%s\n' "$menu"
+  fi
 )"
 
 jq -n --arg ctx "$context" '{

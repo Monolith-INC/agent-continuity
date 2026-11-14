@@ -4,7 +4,7 @@
 [![Tag](https://img.shields.io/github/v/tag/Monolith-INC/agent-continuity?label=latest%20tag)](https://github.com/Monolith-INC/agent-continuity/tags)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-1f6feb?logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
 [![Obsidian](https://img.shields.io/badge/Obsidian-vault%20native-7c3aed?logo=obsidian&logoColor=white)](https://obsidian.md/)
-[![Version](https://img.shields.io/badge/plugin-v0.12.3-0ea5e9)](./.plugin/plugin.json)
+[![Version](https://img.shields.io/badge/plugin-v0.13.0-0ea5e9)](./.plugin/plugin.json)
 
 **Durable knowledge for coding agents.** Pair your repository with an Obsidian vault so agents keep orientation, tickets, style, and architecture context across sessions—instead of rediscovering the project every time.
 
@@ -164,7 +164,8 @@ sequenceDiagram
 ```
 
 1. **`SessionStart` — orientation injection**  
-   Loads vault `README.md` + `Knowledge/Agent_Orientation.md` (configurable) into session context so every run starts oriented.
+   Loads vault `README.md` + `Knowledge/Agent_Orientation.md` (configurable) into session context so every run starts oriented.  
+   Then appends a **session start menu** built from the newest `Agent_Sessions/` records (default 3): resume the most recent unfinished session, pick a recent one, or start fresh. A record counts as unfinished when it has no wikilink forward to a newer record. Tune or turn off with `vault.sessionOptions` (`recent`, `enabled`, `folder`).
 
 2. **`PreToolUse(Read|Grep)` — markdown allowlist**  
    Blocks casual reads of project `.md` outside a small allowlist and the vault. Pushes agents toward the vault / Bases instead of scraping every doc.
