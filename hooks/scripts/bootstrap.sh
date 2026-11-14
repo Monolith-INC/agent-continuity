@@ -3,7 +3,8 @@
 #
 # Config (preferred): $CLAUDE_PROJECT_DIR/.claude/agent-continuity.config.json
 # Legacy fallback:    $CLAUDE_PROJECT_DIR/.claude/codex-workflow.config.json
-#   .vault.folder / .codex.folder       — vault folder name (defaults to glob AI_Codex*/)
+#   .vault.folder / .codex.folder       — vault folder name (defaults to glob AI_Codex*/);
+#                                        it must sit inside the project, or it is ignored
 #   .vault.bootstrap / .codex.bootstrap — relative paths to inject (defaults to
 #                                        README.md + Knowledge/Agent_Orientation.md)
 #   .vault.sessionOptions.enabled       — false turns off the start menu (default true)
@@ -13,10 +14,13 @@
 # Behavior:
 #   - If config exists, its values win.
 #   - If no config and no AI_Codex*/ folder found, the hook is a silent no-op.
+#   - A vault folder setting that points outside the project (absolute path, "..",
+#     or a link leading out) is ignored; the default AI_Codex*/ folder is used and
+#     the agent is told to ask the user for the correct folder.
 #   - Missing individual files are silently skipped.
-#   - A "Session start options" menu built from the newest session records is
-#     appended (see session_options.py), so the agent can offer resume / pick /
-#     start fresh before any other work.
+#   - session_options.py loads the session registry once (index, old-format
+#     upgrade, git snapshot) and its "Session start options" menu is appended, so
+#     the agent can offer resume / pick / start fresh before any other work.
 
 set -euo pipefail
 
@@ -33,15 +37,44 @@ if [[ -n "$config" ]]; then
   vault_folder="$(jq -r '.vault.folder // .codex.folder // ""' "$config")"
 fi
 
+# True when "$1" (relative to the project) is a folder inside the project.
+inside_project() {
+  local target root
+  target="$(cd "$project_dir/$1" 2>/dev/null && pwd -P)" || return 1
+  root="$(cd "$project_dir" && pwd -P)"
+  [[ "$target" == "$root"/* ]]
+}
+
+if [[ -n "$vault_folder" ]] && ! inside_project "$vault_folder"; then
+  vault_folder=""
+fi
+
 if [[ -z "$vault_folder" ]]; then
   for d in "$project_dir"/AI_Codex*/; do
     [[ -d "$d" ]] || continue
+    inside_project "$(basename "$d")" || continue
     vault_folder="$(basename "$d")"
     break
   done
 fi
 
-if [[ -z "$vault_folder" ]] || [[ ! -d "$project_dir/$vault_folder" ]]; then
+menu=""
+if command -v python3 >/dev/null 2>&1; then
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  menu="$(python3 "$script_dir/session_options.py" "$project_dir" 2>/dev/null || true)"
+fi
+
+emit() {
+  jq -n --arg ctx "$1" '{
+    hookSpecificOutput: {
+      hookEventName: "SessionStart",
+      additionalContext: $ctx
+    }
+  }'
+}
+
+if [[ -z "$vault_folder" ]]; then
+  [[ -n "$menu" ]] && emit "$(printf '=== Agent Continuity bootstrap ===\n%s\n' "$menu")"
   exit 0
 fi
 
@@ -63,20 +96,6 @@ for f in "${files[@]}"; do
   [[ -f "$vault_root/$f" ]] && present_files+=("$f")
 done
 
-menu=""
-options_enabled="true"
-recent="3"
-sessions_folder="Agent_Sessions"
-if [[ -n "$config" ]]; then
-  options_enabled="$(jq -r 'if .vault.sessionOptions.enabled == false then "false" else "true" end' "$config")"
-  recent="$(jq -r '.vault.sessionOptions.recent // 3' "$config")"
-  sessions_folder="$(jq -r '.vault.sessionOptions.folder // "Agent_Sessions"' "$config")"
-fi
-if [[ "$options_enabled" == "true" ]] && command -v python3 >/dev/null 2>&1; then
-  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  menu="$(python3 "$script_dir/session_options.py" "$vault_root/$sessions_folder" "$recent" 2>/dev/null || true)"
-fi
-
 if [[ ${#present_files[@]} -eq 0 ]] && [[ -z "$menu" ]]; then
   exit 0
 fi
@@ -93,9 +112,4 @@ context="$(
   fi
 )"
 
-jq -n --arg ctx "$context" '{
-  hookSpecificOutput: {
-    hookEventName: "SessionStart",
-    additionalContext: $ctx
-  }
-}'
+emit "$context"

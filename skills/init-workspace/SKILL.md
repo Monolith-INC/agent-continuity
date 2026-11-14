@@ -61,21 +61,35 @@ Markdown inside Agent Continuity vault is governed by the Session bootstrap rule
 3. **Resume** → keep working in that record; it stays `status: ongoing`. **Pick or start fresh** → close any record still `ongoing` per the README's protocol, then create a new record for this session with `status: ongoing` and a **backlink** to the one just closed.
 4. Sessions form a doubly-linked chain: when closing any record, set `status: closed` and write a **forward link** to its successor.
 
-Every record carries `status` in its frontmatter: `ongoing` (work in progress), `closed` (finished), or `archived` (no longer relevant; hidden from the start menu). The naming hook rejects any other value. Records written before this rule have no `status`; the start menu treats those as ongoing when they have no forward link.
+Every record carries `status` in its frontmatter: `ongoing` (work in progress), `closed` (finished), or `archived` (no longer relevant; hidden from the start menu). The naming hook rejects any other value. **Only the newest record that is not archived can be `ongoing`.**
 
-A `SessionStart` hook (provided by the `agent-continuity` Claude Code plugin) injects the codex README + `Knowledge/Agent_Orientation.md` and builds the start menu from the newest `Agent_Sessions/` records automatically; acting on the choice and steps 3–4 are still on the agent. Without the hook, list the three newest records yourself and offer the same choices.
+### Session lifetime
+
+- **8 hours at most.** When a session passes 8 hours, close it and continue in a new record linked to it. The hooks say when.
+- **Continue or ask.** An ongoing session can be resumed. If the checkout differs from the one it ran in (other branch or folder), or the user's request clearly belongs to different work, **ask the user** whether to close it and start a new session.
+- **Unreadable records never block work.** If a record is malformed, empty or missing, do not stop to ask: open a new record with a backlink to the last readable record, add one line noting the problem, and carry on.
+- **Old-format records** (no `status`, several `ongoing`, missing forward links) are upgraded automatically at session start, and the menu reports what changed: mention it to the user in one line. Run `/agent-continuity:reconcile-sessions` to do it on demand.
+
+A `SessionStart` hook (provided by the `agent-continuity` Claude Code plugin) injects the codex README + `Knowledge/Agent_Orientation.md`, loads the session registry once into a small index (`<vault>/.agent-continuity/session-index.json`, git-ignored), and builds the start menu from it; acting on the choice and steps 3–4 are still on the agent. Without the hook, list the three newest records yourself and offer the same choices.
 
 ### Session record cadence — during work
 
 Open the record at the **first material edit** (not retroactively at the end). Then append updates with these headers:
 
-- **`## Implementation Checkpoint - <timestamp>` — MUST.** At the end of every validated work unit. Body: `Scope` / `Changes` / `Validation`.
+- **`## Implementation Checkpoint - <timestamp>` — MUST**, and only when one of these happened since the last entry (no checkpoint when nothing worth noting happened). Body: `Scope` / `Changes` / `Validation`.
+  1. Code changed in a file for the first time.
+  2. A commit was added.
+  3. A commit was rolled back or amended.
+  4. A task from an implementation plan started or ended.
+  5. The project was pushed (`git push`).
+  6. A code review finished.
+  7. The session is about to end.
 - **`## Pre-Operation Snapshot - <timestamp>` — MUST.** Immediately before any state-disrupting action.
 - **`## Decision - <timestamp>` — MUST.** As soon as an important decision is settled (by the user or by you). Body: what was decided, the options weighed, and why.
 - **`## Pivot - <timestamp>` — SHOULD.** At tranche transitions or scope shifts.
 - **`## Heartbeat - <timestamp>` — safety net.** If 30 minutes pass without any of the above firing.
 
-Two plugin hooks back this up. A `Stop` hook blocks the end of a turn once when project files changed after the ongoing record was last written, asking for a checkpoint (or for a record to be opened if none is ongoing). A `UserPromptSubmit` hook adds a one-line reminder to log a `Decision` entry when the user's message settles one.
+Two plugin hooks back this up. A `Stop` hook compares the code with a git snapshot taken at the previous turn and blocks the end of a turn once when rule 1, 2, 3 or 5 fired and the ongoing record was not updated since (or asks for a record to be opened if none is ongoing). It also asks once to roll over a session older than 8 hours. Rules 4, 6 and 7 are invisible to git and stay on the agent. A `UserPromptSubmit` hook adds a one-line reminder to log a `Decision` entry when the user's message settles one.
 
 ## Repository shape
 

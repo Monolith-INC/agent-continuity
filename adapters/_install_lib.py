@@ -561,11 +561,32 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--prefix", help="Override install root (skips host CLI registration)")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument(
+        "--project",
+        help="After installing, upgrade this project's old-format session records "
+        "(otherwise the first session after install does it)",
+    )
+    parser.add_argument(
         "--uninstall",
         action="store_true",
         help="Remove a managed install only (invoked by adapters/<host>/uninstall.sh)",
     )
     return parser.parse_args(argv)
+
+
+def reconcile_project(root: Path, project: str | None, *, dry_run: bool) -> int:
+    """Upgrade a project's old-format session records right after install (exit code)."""
+    match project:
+        case None | "":
+            return 0
+        case _:
+            script = root / "hooks" / "scripts" / "reconcile_sessions.py"
+            target = str(Path(project).expanduser().resolve())
+            command = [sys.executable, str(script), "--project", target, *([] if dry_run else ["--apply"])]
+            return fold_either(
+                run_command(command, dry_run=False),
+                lambda error: (print(f"Warning: session record upgrade failed: {error}", file=sys.stderr) or 0),
+                lambda _code: 0,
+            )
 
 
 def run(args: argparse.Namespace) -> int:
@@ -577,7 +598,9 @@ def run(args: argparse.Namespace) -> int:
         lambda plan: fold_either(
             uninstall(plan) if args.uninstall else install(plan),
             lambda error: (print(f"Blocked: {error}", file=sys.stderr) or 2),
-            lambda done: (print_next_steps(done) or 0) if not args.uninstall else (
+            lambda done: (
+                print_next_steps(done) or reconcile_project(root, args.project, dry_run=args.dry_run)
+            ) if not args.uninstall else (
                 print(f"Uninstalled managed {args.host} plugin.") or 0
             ),
         ),

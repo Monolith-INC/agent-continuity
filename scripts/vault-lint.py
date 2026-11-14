@@ -71,7 +71,7 @@ def main():
     ticket_ids = {}
 
     for root, dirs, files in os.walk(vault):
-        dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", ".trash")]
+        dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", ".trash", ".agent-continuity")]
         for fn in files:
             if not fn.lower().endswith(".md"):
                 continue

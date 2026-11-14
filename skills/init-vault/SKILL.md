@@ -39,6 +39,11 @@ Default `AI_Codex_<ProjectName>` (ProjectName = repo basename in CamelCase). The
 hook autodetects via glob `AI_Codex*/`, so any `AI_Codex*` name is zero-config; other names need
 `vault.folder` in `.claude/agent-continuity.config.json`. Show the proposed name; let the user override.
 
+**The vault must live inside the project folder.** Refuse any name that is an absolute path,
+climbs out with `..`, or resolves (through a link) outside the project, and ask for a folder
+inside the project instead. The hooks ignore such a setting anyway: they fall back to the
+default `AI_Codex*/` folder and tell the agent to ask the user for the correct one.
+
 ## Step 3 — Refuse if a vault already exists at that name
 
 Check with `ls`/Glob. If it exists, do not overwrite — offer to pick another name, add only the
