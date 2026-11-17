@@ -16,5 +16,7 @@ jobs:
         run: ./scripts/validate.sh
       - name: Adapter packaging tests
         run: python3 -m unittest discover -s adapters/tests -v
+      - name: Session lifecycle tests
+        run: python3 -m unittest discover -s tests -v
       - name: Build all host marketplaces
         run: ./scripts/build_all.sh

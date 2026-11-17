@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.0
+
+- Add session continuation, checkpoint and recovery skills backed by one standard-library Python runtime.
+- Restore progress across chats, link eight-hour continuations, deduplicate retries and first-file edits, and preserve unreadable records while recovering context.
+- Isolate chat chains, detect context changes, use nonblocking process locks and atomic file replacement, and report recoverable persistence failures without gating work.
+- Add lifecycle, recovery and filesystem tests to CI. Automatic host event capture and archival are not included.
+
 ## 0.12.3
 
 - Codex marketplace fix: built adapters emit `.agents/plugins/marketplace.json` (Codex does not accept `.codex-plugin/` alone).
