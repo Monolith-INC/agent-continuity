@@ -6,6 +6,7 @@ import json
 import sys
 import tempfile
 import unittest
+import subprocess
 from dataclasses import replace
 from pathlib import Path
 
@@ -129,6 +130,18 @@ class SessionModelTests(unittest.TestCase):
 
 
 class SessionStoreTests(unittest.TestCase):
+    def test_public_command_does_not_mutate_its_installed_skill(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            import shutil
+            copied = Path(tmp) / "skill"
+            source = Path(__file__).resolve().parents[1] / "skills/session-continue"
+            shutil.copytree(source, copied, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+            result = subprocess.run([sys.executable, str(copied / "scripts/session.py"), "--project", tmp,
+                                     "--root", "journals"], input=json.dumps({"operation": "continue", "chat": "a", "checkout": tmp}),
+                                    text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(tuple(copied.rglob("__pycache__")), ())
+
     def test_real_files_restore_progress_and_replay_without_changes(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp).resolve()

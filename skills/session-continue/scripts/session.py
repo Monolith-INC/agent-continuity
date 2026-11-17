@@ -8,6 +8,9 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Process-boundary interpreter setting: executing a pinned skill must not modify its installed source tree.
+sys.dont_write_bytecode = True
+
 from session_codec import decode, document, encode, request
 from session_model import Failure, Ready
 from session_store import session_task
