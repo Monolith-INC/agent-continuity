@@ -4,9 +4,17 @@
 [![Tag](https://img.shields.io/github/v/tag/Monolith-INC/agent-continuity?label=latest%20tag)](https://github.com/Monolith-INC/agent-continuity/tags)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-1f6feb?logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
 [![Obsidian](https://img.shields.io/badge/Obsidian-vault%20native-7c3aed?logo=obsidian&logoColor=white)](https://obsidian.md/)
-[![Version](https://img.shields.io/badge/plugin-v0.12.3-0ea5e9)](./.plugin/plugin.json)
+[![Version](https://img.shields.io/badge/plugin-v0.13.0-0ea5e9)](./.plugin/plugin.json)
 
 **Durable knowledge for coding agents.** Pair your repository with an Obsidian vault so agents keep orientation, tickets, style, and architecture context across sessions—instead of rediscovering the project every time.
+
+## Session continuity
+
+`session-continue`, `session-checkpoint` and `session-recover` provide a shared, local journal runtime. They restore orientation, decisions, evidence and unfinished work; deduplicate checkpoint retries; link continuations at eight elapsed hours; and recover readable context while preserving damaged records. New chats can pick up the latest checkpoint in the same checkout without modifying another chat's session.
+
+The project supplies its language, journal location and shared knowledge settings. No Obsidian application, tracker login or extra Python package is needed for the session runtime. Existing vault journals remain available as evidence. Persistence failures report a recovery and let the work proceed; these skills install no write gates or automatic event hooks.
+
+The seven checkpoint kinds are first file edit, commit, history change, task start/end, push, review and session end. Invoke them explicitly or through verified host/workflow boundaries; installation alone does not establish automatic capture. See the [public session protocol](skills/session-continue/references/protocol.md).
 
 ### Claude Code
 
